@@ -1,1 +1,7 @@
 streamlit==0.81
+pandas
+numpy
+altair
+pydeck
+bokeh
+plotly
