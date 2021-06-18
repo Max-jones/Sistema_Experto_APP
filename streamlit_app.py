@@ -20,6 +20,9 @@ import pandas as pd
 import numpy as np
 import altair as alt
 import pydeck as pdk
+from bokeh.plotting import figure
+import plotly.figure_factory as ff
+import plotly.express as px
 
 # SETTING PAGE CONFIG TO WIDE MODE
 st.set_page_config(layout="wide")
@@ -29,19 +32,18 @@ DATE_TIME = "date/time"
 DATA_URL = (
     "http://s3-us-west-2.amazonaws.com/streamlit-demo-data/uber-raw-data-sep14.csv.gz"
 )
-path = 'C:\\Users\elmha\OneDrive - Universidad de Chile\Magíster\Tesis\Sistema-Experto\Data\Raw\Horcon-etiquetado_v2.xlsx'
+path = 'C:\\Users\elmha\OneDrive - Universidad de Chile\Magíster\Tesis\Sistema-Experto\Data\processed/dataframe.csv'
+year_selected=2015
 
 @st.cache(persist=True)
 
 def load_data():
-    data = pd.read_excel(path,header=3)# parse_dates=[['Date', 'Time']], usecols=range(8))
-#     # lowercase = lambda x: str(x).lower()
-#     # data.rename(lowercase, axis="columns", inplace=True)
-#     data.set_index('Date_Time',inplace=True)
-#     return data
+    data = pd.read_csv(path)
+    data['Date_Time'] = pd.to_datetime(data['Date_Time'])
+    data.set_index('Date_Time', inplace=True)
+    data[str(year_selected)]
     return data
 
-data = []
 datas = load_data()
 # CREATING FUNCTION FOR MAPS
 
@@ -84,7 +86,9 @@ with row1_2:
     **Examinando las visualizaciones y un mapa**
 
     """)
-    st.dataframe(datas)
+    st.dataframe(data=datas.describe())
+
+
 
 
 # FILTERING DATA BY HOUR SELECTED
@@ -101,38 +105,69 @@ horcon= [-32.723230,-71.466365,15]
 with row2_1:
 #     st.write("**All New York City from %i:00 and %i:00**" % (hour_selected, (hour_selected + 1) % 24))
 #     map(data, midpoint[0], midpoint[1], 11)
-    st.write("**Horcón**")
-    map(data, horcon[0],horcon[1], zoom_selected)
+    # st.write("**Horcón**")
+    # map(data, horcon[0],horcon[1], zoom_selected)
+
+    # x = [1, 2, 3, 4, 5]
+    # y = [6, 7, 2, 4, 5]
+    # p = figure(
+    #     title='simple line example',
+    #     x_axis_label='x',
+    #     y_axis_label='y')
+    # p.line(x, y, legend_label='Trend', line_width=2)
+    # st.bokeh_chart(p, use_container_width=True)
+    # Add histogram data
+    x1 = np.random.randn(200) - 2
+    x2 = np.random.randn(200)
+    x3 = np.random.randn(200) + 2
+    
+    # Group data together
+    hist_data = [x1]
+    
+    group_labels = ['Group 1', 'Group 2', 'Group 3']
+    
+    # Create distplot with custom bin_size
+    # fig = ff.create_distplot(
+    #     # hist_data, group_labels, bin_size=[.1, .25, .5])
+    fig = px.line(datas, y='Pression [cm H2O]', title='Presión')
+    # px.line()
+
+    fig.update_xaxes(
+        rangeslider_visible=True,
+        rangeselector=dict(
+            buttons=list([
+                dict(count=1, label="1m", step="month", stepmode="backward"),
+                dict(count=6, label="6m", step="month", stepmode="backward"),
+                dict(count=1, label="YTD", step="year", stepmode="todate"),
+                dict(count=1, label="1y", step="year", stepmode="backward"),
+                dict(step="all")
+            ]))
+    )
+    fig2 = px.line(datas, y='Temperatura [°C]', title='Temperatura')
+    # px.line()
+
+    fig2.update_xaxes(
+        rangeslider_visible=True,
+        rangeselector=dict(
+            buttons=list([
+                dict(count=1, label="1m", step="month", stepmode="backward"),
+                dict(count=6, label="6m", step="month", stepmode="backward"),
+                dict(count=1, label="YTD", step="year", stepmode="todate"),
+                dict(count=1, label="1y", step="year", stepmode="backward"),
+                dict(step="all")
+            ]))
+    )
+    # fig.show()    
+    
+    # Plot!
+    st.plotly_chart(fig, use_container_width=True)    
+    st.plotly_chart(fig2, use_container_width=True)        
 
 with row2_2:
-    st.dataframe(datas)
+    # st.dataframe(datas)
+    df = pd.DataFrame(
+        np.random.randn(10, 2) / [150, 150] + [-32.723230,-71.466365],
+        columns=['lat', 'lon'])
+    st.map(df,zoom=zoom_selected)
 
-
-
-# FILTERING DATA FOR THE HISTOGRAM
-# filtered = data[
-#     (data.index.month >= month_selected) & (data.index.month < (month_selected + 1))
-#     ]
-
-# hist = np.histogram(filtered.index.day, bins=25, range=(0, 30))[0]
-
-# chart_data = pd.DataFrame({"minute": range(60), "Some Value": hist})
-
-# # LAYING OUT THE HISTOGRAM SECTION
-
-# st.write("")
-
-# st.write("**Breakdown of rides per minute between %i:00 and %i:00**" % (year_selected, (month_selected + 1) % 24))
-
-# st.altair_chart(alt.Chart(chart_data)
-#     .mark_area(
-#         interpolate='step-after',
-#     ).encode(
-#         x=alt.X("minute:Q", scale=alt.Scale(nice=False)),
-#         y=alt.Y("pickups:Q"),
-#         tooltip=['minute', 'pickups']
-#     ).configure_mark(
-#         opacity=0.5,
-#         color='red'
-#     ), use_container_width=True)
 
