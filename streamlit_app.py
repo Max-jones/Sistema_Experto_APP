@@ -40,7 +40,7 @@ def load_data():
     data[str(year_selected)]
     return data
 
-datas = load_data()
+
 # CREATING FUNCTION FOR MAPS
 
 def map(data, lat, lon, zoom):
@@ -74,11 +74,14 @@ uploaded_file = st.file_uploader("Choose a file")
 if uploaded_file is not None:
   df = pd.read_csv(uploaded_file)
   st.write(df)
-
-try:
+  datas=df
+else:
     datas = load_data()
-except:
-    datas = df
+
+# try:
+#     datas = load_data()
+# except:
+#     datas = df
 row1_1, row1_2 = st.beta_columns((2,3))
 
 with row1_1:
