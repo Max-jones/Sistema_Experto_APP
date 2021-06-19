@@ -28,9 +28,10 @@ https://whiteboxml.com/blog/the-definitive-guide-to-python-virtual-environments-
 3. run:
 
 ```
-pip install -r requirements.txt in your shell
+pip install -r requirements.txt
 ```
-
+ in your shell.
+ 
 Y si no, en una terminal que tenga acceso a pip, ejecutar el comando 
 ```
 
