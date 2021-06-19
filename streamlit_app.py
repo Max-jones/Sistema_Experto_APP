@@ -28,10 +28,6 @@ import plotly.express as px
 st.set_page_config(layout="wide")
 
 # LOADING DATA
-DATE_TIME = "date/time"
-DATA_URL = (
-    "http://s3-us-west-2.amazonaws.com/streamlit-demo-data/uber-raw-data-sep14.csv.gz"
-)
 path = 'C:\\Users\elmha\OneDrive - Universidad de Chile\Magíster\Tesis\Sistema-Experto\Data\processed/dataframe.csv'
 year_selected=2015
 
@@ -74,7 +70,17 @@ def map(data, lat, lon, zoom):
 
 st.title("Sistema Experto - Visualizaciones - Pruebas")
 zoom_selected = st.slider("Zood", 10 , 20)
+uploaded_file = st.file_uploader("Choose a file")
+if uploaded_file is not None:
+  df = pd.read_csv(uploaded_file)
+  st.write(df)
+
+try:
+    datas = load_data()
+except:
+    datas = df
 row1_1, row1_2 = st.beta_columns((2,3))
+
 with row1_1:
     # st.title("Sistema Experto - Visualizaciones - Pruebas")
     # zoom_selected = st.slider("Zoom", 10 , 20)
