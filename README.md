@@ -54,4 +54,4 @@ streamlit run streamlit_app.py
 
 2. Cargar un archivo .csv con la estructura de data del proyecto.
 
-![DEMO](images\demo.gif)
+![DEMO](images/demo.gif)
