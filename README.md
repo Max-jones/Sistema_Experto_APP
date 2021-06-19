@@ -38,7 +38,7 @@ Y si no, en una terminal que tenga acceso a pip, ejecutar el comando
 $ pip install -r requirements.txt'
 ```
 
-### Correr la aplicación WEB de forma local.
+### Correr la aplicación de forma local.
 
 Abriendo un terminal con el virtualenv o si se realizó la instalación de la segunda forma (debe estar instalada la librería streamlit)
 
@@ -47,3 +47,11 @@ Para poder probar la app es necesario abrir un terminal en la carpeta del proyec
 ```
 streamlit run streamlit_app.py
 ```
+
+### Correr la aplicación WEB.
+
+1. Dirigirse a [Enlace Aplicación](https://share.streamlit.io/max-jones/sistema_experto_app/main/app.py)
+
+2. Cargar un archivo .csv con la estructura de data del proyecto.
+
+![DEMO](images\demo.gif)
