@@ -86,7 +86,10 @@ if uploaded_file is not None:
 
     """)
 else:
-    datas = load_data()
+    try:
+        datas = load_data()
+    except:
+        KeyError()
 
 
 row1_1, row1_2 = st.beta_columns((2,3))
