@@ -29,7 +29,7 @@ st.set_page_config(layout="wide")
 
 # LOADING DATA
 path = 'C:\\Users\elmha\OneDrive - Universidad de Chile\Magíster\Tesis\Sistema-Experto\Data\processed/dataframe.csv'
-year_selected=2015
+# year_selected=2015
 
 @st.cache(persist=True)
 
@@ -37,7 +37,7 @@ def load_data():
     data = pd.read_csv(path)
     data['Date_Time'] = pd.to_datetime(data['Date_Time'])
     data.set_index('Date_Time', inplace=True)
-    data[str(year_selected)]
+    # data[str(year_selected)]
     return data
 
 
@@ -69,19 +69,26 @@ def map(data, lat, lon, zoom):
 # LAYING OUT THE TOP SECTION OF THE APP
 
 st.title("Sistema Experto - Visualizaciones - Pruebas")
+
 zoom_selected = st.slider("Zood", 10 , 20)
 uploaded_file = st.file_uploader("Choose a file")
+
 if uploaded_file is not None:
-  df = pd.read_csv(uploaded_file)
-  st.write(df)
-  datas=df
+    df = pd.read_csv(uploaded_file)
+    df['Date_Time'] = pd.to_datetime(df['Date_Time'])
+    df.set_index('Date_Time', inplace=True)
+    datas=df
+    st.write(
+    """
+    ##
+
+    **Se ha cargado un archivo. Este debe ser .csv**
+
+    """)
 else:
     datas = load_data()
 
-# try:
-#     datas = load_data()
-# except:
-#     datas = df
+
 row1_1, row1_2 = st.beta_columns((2,3))
 
 with row1_1:
