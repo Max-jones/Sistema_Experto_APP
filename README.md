@@ -27,14 +27,13 @@ https://whiteboxml.com/blog/the-definitive-guide-to-python-virtual-environments-
 2. activate your virtualenv
 3. run:
 
-```
+```console
 pip install -r requirements.txt
 ```
  in your shell.
  
 Y si no, en una terminal que tenga acceso a pip, ejecutar el comando 
-```
-
+```console
 $ pip install -r requirements.txt'
 ```
 
@@ -44,7 +43,7 @@ Abriendo un terminal con el virtualenv o si se realizó la instalación de la se
 
 Para poder probar la app es necesario abrir un terminal en la carpeta del proyecto y correr
 
-```
+```console
 streamlit run streamlit_app.py
 ```
 
