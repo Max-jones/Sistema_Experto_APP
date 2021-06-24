@@ -89,7 +89,7 @@ else:
     try:
         datas = load_data()
     except:
-        KeyError()
+       raise KeyError('Por favor cargue un archivo .csv compatible')
 
 
 row1_1, row1_2 = st.beta_columns((2,3))
