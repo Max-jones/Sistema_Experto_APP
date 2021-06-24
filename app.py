@@ -70,7 +70,7 @@ def map(data, lat, lon, zoom):
 
 st.title("Sistema Experto - Visualizaciones - Pruebas")
 
-zoom_selected = st.slider("Zood", 10 , 20)
+zoom_selected = st.slider("Zoom del mapa", 10 , 16)
 uploaded_file = st.file_uploader("Choose a file")
 
 if uploaded_file is not None:
