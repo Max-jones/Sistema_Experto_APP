@@ -90,7 +90,7 @@ else:
         datas = load_data()
     except:
 
-        st.error(‘Please enter a valid input’)
+        st.error('Please enter a valid input')
         raise KeyError('Por favor cargue un archivo .csv compatible')
 
 
