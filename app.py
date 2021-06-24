@@ -90,8 +90,8 @@ else:
         datas = load_data()
     except:
 
-        st.error('Please enter a valid input')
-        raise KeyError('Por favor cargue un archivo .csv compatible')
+        st.error('Por favor cargue un archivo .csv compatible')
+        # raise KeyError('Por favor cargue un archivo .csv compatible')
 
 
 row1_1, row1_2 = st.beta_columns((2,3))
