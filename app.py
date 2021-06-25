@@ -232,7 +232,7 @@ with row2_2:
 
 Se utiliza un modelo pre-entrenado utilizado LightGBM sobre toda la data cargada.
 '''
-loaded_lgbm = lgbm.Booster(model_file='models\lgb_classifier.txt')
+loaded_lgbm = lgbm.Booster(model_file='lgb_classifier.txt')
 
 # valores = datas_unl.loc[datas_unl.index[0]].to_numpy().reshape((1,-1))
 # st.write(valores[0])
