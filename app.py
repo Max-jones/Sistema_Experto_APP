@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""An example of showing geographic data."""
+# %% Imports -> requeriments.txt 
 
 import streamlit as st
 import pandas as pd
@@ -23,21 +23,30 @@ import pydeck as pdk
 from bokeh.plotting import figure
 import plotly.figure_factory as ff
 import plotly.express as px
+import seaborn as sns
+import lightgbm as lgbm
+from streamlit.proto.DataFrame_pb2 import DataFrame
 
+### Initial Confiugurations
 # SETTING PAGE CONFIG TO WIDE MODE
 st.set_page_config(layout="wide")
 
-# LOADING DATA
-path = 'C:\\Users\elmha\OneDrive - Universidad de Chile\Magíster\Tesis\Sistema-Experto\Data\processed/dataframe.csv'
-# year_selected=2015
+# LOADING LOCAL DATA IF EXISTS.
+local_path = 'C:\\Users\elmha\OneDrive - Universidad de Chile\Magíster\Tesis\Sistema-Experto\Data\processed/dataframe.csv'
+
+
 
 @st.cache(persist=True)
 
-def load_data():
+def load_data(path):
+    '''
+    ARGS: path to the local .csv file
+    Load data and search for the Date_Time column to index the dataframe by a datetime value.
+
+    '''
     data = pd.read_csv(path)
     data['Date_Time'] = pd.to_datetime(data['Date_Time'])
     data.set_index('Date_Time', inplace=True)
-    # data[str(year_selected)]
     return data
 
 # CREATING FUNCTION FOR MAPS
@@ -93,7 +102,7 @@ if uploaded_file is not None:
     """)
 else:
     try:
-        datas = load_data()
+        datas = load_data(local_path)
     except:
 
         st.error('Por favor cargue un archivo .csv compatible')
@@ -194,20 +203,87 @@ with row2_1:
     zoom_selected = st.slider("Zoom del mapa", 10 , 16)
 
     st.write('Descripción estadística del dataset cargado.')
-    st.write(datas[["Pression [cm H2O]","Temperatura [°C]","EC [µs/cm]"]].describe())
-    horcon= [-32.723230,-71.466365,15]
-  
-     
-    st.write('Datos disponibles',datas.columns.to_list()) 
-     
+    datas_unl=datas.drop(labels=['Etiqueta P','Etiqueta T','Etiqueta EC'],axis=1)
+    # datas_raw=datas[["Pression [cm H2O]","Temperatura [°C]","EC [µs/cm]]
+    st.write(datas_unl.describe())
+    # [["Pression [cm H2O]","Temperatura [°C]","EC [µs/cm]"]].describe())
+
+    st.write('Datos disponibles',datas_unl.columns.to_list()) 
+    # import matplotlib.pyplot as plt
+    # plt.figure(figsize=(3, 3))
+    # sns.pairplot(datas_unl,height=3)
+    # st.write(pairplot.fig)
 
 with row2_2:
     # st.dataframe(datas)
+    # horcon= [-32.723230,-71.466365,15]
     map_points = pd.DataFrame(
         np.random.randn(10, 2) / [150, 150] + [-32.723230,-71.466365],
         columns=['lat', 'lon'])
     st.map(map_points,zoom=zoom_selected)
+    
+    corr = datas_unl.corr()
+    heatmap=sns.heatmap(corr, annot=True,cmap="YlGnBu").figure
+    st.write(heatmap)
 
+# %% Anomalías
 '''
 ## Detección de anomalías
+
+Se utiliza un modelo pre-entrenado utilizado LightGBM sobre toda la data cargada.
 '''
+loaded_lgbm = lgbm.Booster(model_file='models\lgb_classifier.txt')
+
+# valores = datas_unl.loc[datas_unl.index[0]].to_numpy().reshape((1,-1))
+# st.write(valores[0])
+# st.write()
+# chart = st.line_chart(valores[0][0])
+
+# for i in range(10): #range(len(datas_unl.index)):
+
+    # input=datas_unl.loc[datas_unl.index[i]].to_numpy().reshape((1,-1))
+
+    # st.pyplot(input)
+prob_output=loaded_lgbm.predict(datas_unl.to_numpy())
+output = np.int8(prob_output >= 0.5)
+
+new_data = datas_unl.copy()
+# st.dataframe(data=new_data)
+# new_data =new_data['label']=np.array(output)
+
+b=pd.DataFrame(output,columns=['label'])
+# st.write(b)
+# st.write(datas_unl)
+# st.write(b.columns)
+datas_unl['label'] = b.values
+new_data.insert(3,'label', b.to_numpy(),True)
+# st.write(new_data.columns,new_data.shape)
+import matplotlib.pyplot as plt
+
+a = new_data.loc[new_data['label'] == 1] #anomaly
+
+fig = plt.figure(figsize=(14,3))
+_ = plt.plot(new_data['Pression [cm H2O]'], color='fuchsia', label='Normal')
+_ = plt.plot(a['Pression [cm H2O]'], linestyle='none', marker='X', color='orange', markersize=12, label='Anomaly', alpha=0.6)
+_ = plt.xlabel('Marca temporal')
+_ = plt.ylabel('Sensor Reading')
+_ = plt.legend(loc='best')
+_ = plt.title('Anomalías sobre Presión ')
+st.write(fig)
+
+fig = plt.figure(figsize=(14,3))
+_ = plt.plot(new_data['Temperatura [°C]'], color='fuchsia', label='Normal')
+_ = plt.plot(a['Temperatura [°C]'], linestyle='none', marker='X', color='orange', markersize=12, label='Anomaly', alpha=0.6)
+_ = plt.xlabel('Marca temporal')
+_ = plt.ylabel('Sensor Reading')
+_ = plt.legend(loc='best')
+_ = plt.title('Anomalías sobre Temperatura ')
+st.write(fig)
+fig = plt.figure(figsize=(14,3))
+_ = plt.plot(new_data['EC [µs/cm]'], color='fuchsia', label='Normal')
+_ = plt.plot(a['EC [µs/cm]'], linestyle='none', marker='X', color='orange', markersize=12, label='Anomaly', alpha=0.6)
+_ = plt.xlabel('Marca temporal')
+_ = plt.ylabel('Sensor Reading')
+_ = plt.legend(loc='best')
+_ = plt.title('Anomalies sobre la conductividad eléctrica ')
+st.write(fig)
