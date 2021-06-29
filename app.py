@@ -29,7 +29,11 @@ from streamlit.proto.DataFrame_pb2 import DataFrame
 
 ### Initial Confiugurations
 # SETTING PAGE CONFIG TO WIDE MODE
-st.set_page_config(layout="wide")
+st.set_page_config(
+    layout="wide",
+    page_title='Plataforma Abierta - Sistema Experto',
+    page_icon='🌊'
+    )
 
 # LOADING LOCAL DATA IF EXISTS.
 local_path = 'C:\\Users\elmha\OneDrive - Universidad de Chile\Magíster\Tesis\Sistema-Experto\Data\processed/dataframe.csv'
@@ -230,7 +234,7 @@ with row2_2:
 '''
 ## Detección de anomalías
 
-Se utiliza un modelo pre-entrenado utilizado LightGBM sobre toda la data cargada.
+Se utiliza un modelo pre-entrenado basado en LightGBM sobre toda la data cargada para visualizar anomalías.
 '''
 loaded_lgbm = lgbm.Booster(model_file='lgb_classifier.txt')
 
@@ -279,11 +283,12 @@ _ = plt.ylabel('Sensor Reading')
 _ = plt.legend(loc='best')
 _ = plt.title('Anomalías sobre Temperatura ')
 st.write(fig)
+
 fig = plt.figure(figsize=(14,3))
 _ = plt.plot(new_data['EC [µs/cm]'], color='fuchsia', label='Normal')
 _ = plt.plot(a['EC [µs/cm]'], linestyle='none', marker='X', color='orange', markersize=12, label='Anomaly', alpha=0.6)
 _ = plt.xlabel('Marca temporal')
 _ = plt.ylabel('Sensor Reading')
 _ = plt.legend(loc='best')
-_ = plt.title('Anomalies sobre la conductividad eléctrica ')
+_ = plt.title('Anomalías sobre la conductividad eléctrica ')
 st.write(fig)
