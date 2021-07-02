@@ -28,6 +28,7 @@ import lightgbm as lgbm
 from streamlit.proto.DataFrame_pb2 import DataFrame
 import plotly.graph_objects as go
 
+
 ### Initial Confiugurations
 # SETTING PAGE CONFIG TO WIDE MODE
 st.set_page_config(
@@ -39,7 +40,6 @@ st.set_page_config(
 
 # LOADING LOCAL DATA IF EXISTS.
 local_path = 'C:\\Users\elmha\OneDrive - Universidad de Chile\Magíster\Tesis\Sistema-Experto\Data\processed/dataframe.csv'
-
 
 
 @st.cache(persist=True)
@@ -136,7 +136,7 @@ with st.beta_expander("Mostrar Dataset Completo"):
 
 p = datas.loc[datas['Etiqueta P'] == 1] #anomaly
 
-import plotly.graph_objects as go
+
 
 figg = go.Figure()
 
@@ -144,11 +144,11 @@ figg.add_trace(go.Scatter(x=datas.index, y=datas['Pression [cm H2O]'],
                     mode='lines',
                     name='operación normal',
                     line_color='cadetblue'))
-figg.add_trace(go.Scatter(x=p.index, y=p['Pression [cm H2O]'],
-                    mode='markers',
-                    name='anomalía etiquetada',
-                    marker_color='cyan',
-                    marker_line_width=0.5))
+# figg.add_trace(go.Scatter(x=p.index, y=p['Pression [cm H2O]'],
+#                     mode='markers',
+#                     name='anomalía etiquetada',
+#                     marker_color='cyan',
+#                     marker_line_width=0.5))
 # figg.update_traces(mode='markers', marker_line_width=2, marker_size=10)
 figg.update_layout(title='Presión [cm H2O]',
                     yaxis_title='Presión [cm H2O]',
@@ -166,11 +166,11 @@ figg2.add_trace(go.Scatter(x=datas.index, y=datas['Temperatura [°C]'],
                     mode='lines',
                     name='operación normal',
                     line_color='darkolivegreen'))
-figg2.add_trace(go.Scatter(x=t.index, y=t['Temperatura [°C]'],
-                    mode='markers',
-                    name='anomalía etiquetada',
-                    marker_color='cyan',
-                    marker_line_width=0.5))
+# figg2.add_trace(go.Scatter(x=t.index, y=t['Temperatura [°C]'],
+#                     mode='markers',
+#                     name='anomalía etiquetada',
+#                     marker_color='cyan',
+#                     marker_line_width=0.5))
 # figg.update_traces(mode='markers', marker_line_width=2, marker_size=10)
 figg2.update_layout(title='Temperatura [°C]',
                     yaxis_title='Temperatura [°C]',
@@ -179,91 +179,29 @@ figg2.update_layout(title='Temperatura [°C]',
 
 st.plotly_chart(figg2, use_container_width=True)
 
+
 e = datas.loc[datas['Etiqueta EC'] == 1] #anomaly
+
 figg3 = go.Figure()
 
 figg3.add_trace(go.Scatter(x=datas.index, y=datas['EC [µs/cm]'],
                     mode='lines',
                     name='operación normal',
                     line_color='darkgoldenrod'))
-figg3.add_trace(go.Scatter(x=e.index, y=e['EC [µs/cm]'],
-                    mode='markers',
-                    name='anomalía etiquetada',
-                    marker_color='cyan',
-                    marker_line_width=0.5))
+# figg3.add_trace(go.Scatter(x=e.index, y=e['EC [µs/cm]'],
+#                     mode='markers',
+#                     name='anomalía etiquetada',
+#                     marker_color='cyan',
+#                     marker_line_width=0.5))
 # figg.update_traces(mode='markers', marker_line_width=2, marker_size=10)
 figg3.update_layout(title='EC [µs/cm]',
                     yaxis_title='EC [µs/cm]',
                     xaxis_title='Fecha'
 )
 
-
 st.plotly_chart(figg3, use_container_width=True)
 
-# row1_1, row1_2, row1_3 = st.beta_columns((2,2,2))
 
-# with row1_1:
-#     # p = datas.loc[datas['Etiqueta P'] == 1] #anomaly
-#     fig1 = px.line(datas, y='Pression [cm H2O]', title='Presión [cm H2O]')
-#     # fig1.add_
-#     # px.line()
-#     # fig1.add_scatter(p,y='Pression [cm H2O]',title='anomaly')
-#     fig1.update_xaxes(
-#         rangeslider_visible=True,
-#         rangeselector=dict(
-#             buttons=list([
-#                 dict(count=1, label="1m", step="month", stepmode="backward"),
-#                 dict(count=6, label="6m", step="month", stepmode="backward"),
-#                 dict(count=1, label="YTD", step="year", stepmode="todate"),
-#                 dict(count=1, label="1y", step="year", stepmode="backward"),
-#                 dict(step="all")
-#             ])
-#         )
-#     )
-#     st.plotly_chart(fig1, use_container_width=True) 
-# with row1_2:
-
-#     fig2 = px.line(datas, y='Temperatura [°C]',color="Etiqueta T", title='Temperatura [°C]')
-#     # px.line()
-  
-#     fig2.update_xaxes(
-#         rangeslider_visible=True,
-#         rangeselector=dict(
-#             buttons=list([
-#                 dict(count=1, label="1m", step="month", stepmode="backward"),
-#                 dict(count=6, label="6m", step="month", stepmode="backward"),
-#                 dict(count=1, label="YTD", step="year", stepmode="todate"),
-#                 dict(count=1, label="1y", step="year", stepmode="backward"),
-#                 dict(step="all")
-#             ])
-#         )
-#     )
-#     st.plotly_chart(fig2, use_container_width=True) 
-# with row1_3:
-#     fig3 = px.line(datas, y='EC [µs/cm]', title='Conductividad Eléctrica [µs/cm]')
-#     # px.line()
-
-#     fig3.update_xaxes(
-#         rangeslider_visible=True,
-#         rangeselector=dict(
-#             buttons=list([
-#                 dict(count=1, label="1m", step="month", stepmode="backward"),
-#                 dict(count=6, label="6m", step="month", stepmode="backward"),
-#                 dict(count=1, label="YTD", step="year", stepmode="todate"),
-#                 dict(count=1, label="1y", step="year", stepmode="backward"),
-#                 dict(step="all")
-#             ])
-#         )
-#     )
-#     st.plotly_chart(fig3, use_container_width=True)  
-
-
-
-# FILTERING DATA BY HOUR SELECTED
-# data = data[data.index.year == year_selected]
-
-# LAYING OUT THE MIDDLE SECTION OF THE APP WITH THE MAPS
-#  row2_1, row2_2, row2_3, row2_4 = st.beta_columns((2,1,1,1))
 with st.beta_expander("Ver análisis estadístico"):
     row2_1, row2_2 = st.beta_columns((2,3))
 
@@ -306,68 +244,125 @@ with st.beta_expander("Ver análisis estadístico"):
         st.write(heatmap)
 
 # %% Anomalías
-'''
-## Detección de anomalías
+with st.beta_expander("Procesar Anomalías",expanded=True):
 
-Se utiliza un modelo pre-entrenado basado en LightGBM sobre toda la data cargada para visualizar anomalías.
-'''
-loaded_lgbm = lgbm.Booster(model_file='lgb_classifier.txt')
+    '''
+    ## Detección de anomalías
 
-# valores = datas_unl.loc[datas_unl.index[0]].to_numpy().reshape((1,-1))
-# st.write(valores[0])
-# st.write()
-# chart = st.line_chart(valores[0][0])
+    Se utiliza un modelo pre-entrenado basado en LightGBM sobre toda la data cargada para visualizar anomalías.
+    '''
+    loaded_lgbm = lgbm.Booster(model_file='lgb_classifier.txt')
 
-# for i in range(10): #range(len(datas_unl.index)):
+    prob_output=loaded_lgbm.predict(datas_unl.to_numpy())
+    output = np.int8(prob_output >= 0.5)
 
-    # input=datas_unl.loc[datas_unl.index[i]].to_numpy().reshape((1,-1))
+    new_data = datas_unl.copy()
+    # st.dataframe(data=new_data)
+    # new_data =new_data['label']=np.array(output)
 
-    # st.pyplot(input)
-prob_output=loaded_lgbm.predict(datas_unl.to_numpy())
-output = np.int8(prob_output >= 0.5)
+    b=pd.DataFrame(output,columns=['label'])
+    # st.write(b)
+    # st.write(datas_unl)
+    # st.write(b.columns)
+    datas_unl['etiqueta_anomalía'] = b.values
+    new_data.insert(3,'etiqueta_anomalia', b.to_numpy(),True)
+    # st.write(new_data.columns,new_data.shape)
+    import matplotlib.pyplot as plt
 
-new_data = datas_unl.copy()
-# st.dataframe(data=new_data)
-# new_data =new_data['label']=np.array(output)
+    def read_anomalies(new_data):
+        a = new_data.loc[new_data['etiqueta_anomalia'] == 1] #anomaly
+        return a
 
-b=pd.DataFrame(output,columns=['label'])
-# st.write(b)
-# st.write(datas_unl)
-# st.write(b.columns)
-datas_unl['label'] = b.values
-new_data.insert(3,'label', b.to_numpy(),True)
-# st.write(new_data.columns,new_data.shape)
-import matplotlib.pyplot as plt
+    a = read_anomalies(new_data)
 
-def read_anomalies(new_data):
-    a = new_data.loc[new_data['label'] == 1] #anomaly
-    return a
+    st.write(new_data)
 
-a = read_anomalies(new_data)
+    p = datas.loc[datas['Etiqueta P'] == 1] #anomaly
 
-fig = plt.figure(figsize=(14,3))
-_ = plt.plot(new_data['Pression [cm H2O]'], color='fuchsia', label='Normal')
-_ = plt.plot(a['Pression [cm H2O]'], linestyle='none', marker='X', color='orange', markersize=12, label='Anomaly', alpha=0.6)
-_ = plt.xlabel('Marca temporal')
-_ = plt.ylabel('Sensor Reading')
-_ = plt.legend(loc='best')
-_ = plt.title('Anomalías sobre Presión ')
-st.write(fig)
+    import plotly.graph_objects as go
 
-fig = plt.figure(figsize=(14,3))
-_ = plt.plot(new_data['Temperatura [°C]'], color='fuchsia', label='Normal')
-_ = plt.plot(a['Temperatura [°C]'], linestyle='none', marker='X', color='orange', markersize=12, label='Anomaly', alpha=0.6)
-_ = plt.xlabel('Marca temporal')
-_ = plt.ylabel('Sensor Reading')
-_ = plt.legend(loc='best')
-_ = plt.title('Anomalías sobre Temperatura ')
-st.write(fig)
+    figg = go.Figure()
 
-fig = plt.figure(figsize=(14,3))
-_ = plt.plot(new_data['EC [µs/cm]'], color='fuchsia', label='Normal')
-_ = plt.plot(a['EC [µs/cm]'], linestyle='none', marker='X', color='orange', markersize=12, label='Anomaly', alpha=0.6)
-_ = plt.xlabel('Marca temporal')
-_ = plt.ylabel('Sensor Reading')
-_ = plt.legend(loc='best')
-_ = plt.title('Anomalías sobre la conductividad eléctrica ')
-st.write(fig)
+    figg.add_trace(go.Scatter(x=datas.index, y=datas['Pression [cm H2O]'],
+                        mode='lines',
+                        name='operación normal',
+                        line_color='cadetblue'))
+    figg.add_trace(go.Scatter(x=p.index, y=p['Pression [cm H2O]'],
+                        mode='markers',
+                        name='anomalía etiquetada',
+                        marker_color='cyan',
+                        marker_line_width=0.5,
+                        opacity=0.5))
+    figg.add_trace(go.Scatter(x=a.index, y=a['Pression [cm H2O]'],
+                        mode='markers',
+                        name='anomalía detectada',
+                        marker_color='orange',
+                        marker_line_width=0.5,
+                        opacity=0.7))
+                                            
+    # figg.update_traces(mode='markers', marker_line_width=2, marker_size=10)
+    figg.update_layout(title='Presión [cm H2O]',
+                        yaxis_title='Presión [cm H2O]',
+                        xaxis_title='Fecha'
+    )
+
+    st.plotly_chart(figg, use_container_width=True)
+
+
+    t = datas.loc[datas['Etiqueta T'] == 1] #anomaly
+
+    figg2 = go.Figure()
+
+    figg2.add_trace(go.Scatter(x=datas.index, y=datas['Temperatura [°C]'],
+                        mode='lines',
+                        name='operación normal',
+                        line_color='darkolivegreen'))
+    figg2.add_trace(go.Scatter(x=t.index, y=t['Temperatura [°C]'],
+                        mode='markers',
+                        name='anomalía etiquetada',
+                        marker_color='cyan',
+                        marker_line_width=0.5,
+                        opacity=0.5))
+    figg2.add_trace(go.Scatter(x=a.index, y=a['Temperatura [°C]'],
+                        mode='markers',
+                        name='anomalía detectada',
+                        marker_color='orange',
+                        marker_line_width=0.5,
+                        opacity=0.7))        
+    # figg.update_traces(mode='markers', marker_line_width=2, marker_size=10)
+    figg2.update_layout(title='Temperatura [°C]',
+                        yaxis_title='Temperatura [°C]',
+                        xaxis_title='Fecha'
+    )
+
+    st.plotly_chart(figg2, use_container_width=True)
+
+    e = datas.loc[datas['Etiqueta EC'] == 1] #anomaly
+    figg3 = go.Figure()
+
+    figg3.add_trace(go.Scatter(x=datas.index, y=datas['EC [µs/cm]'],
+                        mode='lines',
+                        name='operación normal',
+                        line_color='darkgoldenrod'))
+    figg3.add_trace(go.Scatter(x=e.index, y=e['EC [µs/cm]'],
+                        mode='markers',
+                        name='anomalía etiquetada',
+                        marker_color='cyan',
+                        marker_line_width=0.5,
+                        opacity=0.5))
+    figg3.add_trace(go.Scatter(x=a.index, y=a['EC [µs/cm]'],
+                        mode='markers',
+                        name='anomalía detectada',
+                        marker_color='orange',
+                        marker_line_width=0.5,
+                        opacity=0.7))                     
+    # figg.update_traces(mode='markers', marker_line_width=2, marker_size=10)
+    figg3.update_layout(title='EC [µs/cm]',
+                        yaxis_title='EC [µs/cm]',
+                        xaxis_title='Fecha'
+    )
+
+
+    st.plotly_chart(figg3, use_container_width=True)
+
+# %%
