@@ -28,6 +28,7 @@ import lightgbm as lgbm
 from streamlit.proto.DataFrame_pb2 import DataFrame
 import plotly.graph_objects as go
 import requests
+import pytz
 
 ### Initial Confiugurations
 # SETTING PAGE CONFIG TO WIDE MODE
@@ -45,21 +46,20 @@ url_queries = 'http://agua.niclabs.cl/queries'
 
 api_key_header = {'query-api-key': '919c5e5e086a492398141c1ebd95b711'}
 
-
 @st.cache(persist=True)
 
-def load_data(path):
-    '''
-    ARGS: path to the local .csv file
-    Load data and search for the Date_Time column to index the dataframe by a datetime value.
+# def load_data(path):
+#     '''
+#     ARGS: path to the local .csv file
+#     Load data and search for the Date_Time column to index the dataframe by a datetime value.
 
-    '''
-    data = pd.read_csv(path)
-    data['Date_Time'] = pd.to_datetime(data['Date_Time'])
-    data.set_index('Date_Time', inplace=True)
-    chile=pytz.timezone('Chile/Continental')
-    data.index = data.index.tz_localize(pytz.utc).tz_convert(chile)
-    return data
+#     '''
+#     data = pd.read_csv(path)
+#     data['Date_Time'] = pd.to_datetime(data['Date_Time'])
+#     data.set_index('Date_Time', inplace=True)
+#     chile=pytz.timezone('Chile/Continental')
+#     data.index = data.index.tz_localize(pytz.utc).tz_convert(chile)
+#     return data
 
 # CREATING FUNCTION FOR MAPS
 
@@ -96,18 +96,19 @@ def map(data, lat, lon, zoom):
             "zoom": zoom,
             "pitch": 50
         },
-        tooltip={"text": "Horcón\n Mediciones disponibles: \n CE, Temp, Nivel"},
+        tooltip={"text": "Horcón {}, {}\n Mediciones disponibles: \n CE, Temp, Nivel".format(lat,lon)},
         layers=[
             pdk.Layer(
                 "HexagonLayer",
                 data=data,
                 get_position=["lon", "lat"],
-                radius=10,
+                radius=20,
                 elevation_scale=4,
                 elevation_range=[0, 1000],
                 pickable=True,
                 extruded=True,
-            ),
+                colorRange=[[237,248,251],[191,211,230],[158,188,218],[140,150,198],[136,86,167],[129,15,124]]
+            )
         ]
     ))
 
@@ -120,24 +121,26 @@ def map(data, lat, lon, zoom):
 '''
 ## Cargar el dataset a procesar
 
+
 '''
 
-selected_estacion =st.selectbox(
-    'Seleccione una estación',
-    ('7','1'))
+with st.beta_expander('Consultar Información de estación en la base de datos'):
+    selected_estacion =st.selectbox(
+        'Seleccione una estación',
+        ('7','1'))
 
-r=get_info_estacion(selected_estacion)
-_json=get_all_data(selected_estacion)
+    r=get_info_estacion(selected_estacion)
+    # _json=get_all_data(selected_estacion)
 
-# the json file where the output must be stored 
-# out_file = open("myfile.json", "w")
-# json.dump(r2, out_file, indent = 3)  
-# df_dict=[{'timestamp':item[]}]
-df = pd.DataFrame(r)
-st.write(df)
+    # the json file where the output must be stored 
+    # out_file = open("myfile.json", "w")
+    # json.dump(r2, out_file, indent = 3)  
+    # df_dict=[{'timestamp':item[]}]
+    df = pd.DataFrame(r)
+    st.write(df)
 
 
-import pytz
+
 
 # Sección de carga del archivo .csv
 
@@ -145,7 +148,7 @@ import pytz
 uploaded_file = st.file_uploader("Selecciona un archivo .csv ")
 
 while uploaded_file is not None:
-    df = pd.read_csv(uploaded_file)
+    df = pd.read_csv(uploaded_file,engine='python')
     df['Date_Time'] = pd.to_datetime(df['Date_Time'])#,format='%Y-%m-%d %H:%m:%S')
     df.set_index('Date_Time', inplace=True)
     chile=pytz.timezone('Chile/Continental')
@@ -185,14 +188,14 @@ while uploaded_file is not None:
         # # [["Pression [cm H2O]","Temperatura [°C]","EC [µs/cm]"]].describe())
 
         # st.write('Datos disponibles',datas_unl.columns.to_list()) 
-        with row1_2:
-            # st.dataframe(datas)
-            horcon= [[-32.70846697,-71.49001948]]
-            map_points = pd.DataFrame(
-                horcon,
-                columns=['lat', 'lon'])
-            # st.map(map_points,13,)
-            map(map_points,horcon[0][0],horcon[0][1],15)
+    with row1_2:
+        # st.dataframe(datas)
+        horcon= [[-32.70846697,-71.49001948]]
+        map_points = pd.DataFrame(
+            horcon,
+            columns=['lat', 'lon'])
+        # st.map(map_points,13,)
+        map(map_points,horcon[0][0],horcon[0][1],18)
             
     '''
     ## Dataset Seleccionado
@@ -397,7 +400,7 @@ while uploaded_file is not None:
         figg2.add_trace(go.Scatter(x=a.index, y=a['Temperatura [°C]'],
                             mode='markers',
                             name='anomalía detectada',
-                            marker_color='orange',
+                            marker_color='red',
                             marker_line_width=0.5,
                             opacity=0.7))        
         # figg.update_traces(mode='markers', marker_line_width=2, marker_size=10)
@@ -424,7 +427,7 @@ while uploaded_file is not None:
         figg3.add_trace(go.Scatter(x=a.index, y=a['EC [µs/cm]'],
                             mode='markers',
                             name='anomalía detectada',
-                            marker_color='orange',
+                            marker_color='red',
                             marker_line_width=0.5,
                             opacity=0.7))                     
         # figg.update_traces(mode='markers', marker_line_width=2, marker_size=10)
@@ -436,4 +439,3 @@ while uploaded_file is not None:
 
         st.plotly_chart(figg3, use_container_width=True)
 
-    # %%
