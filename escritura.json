@@ -1,0 +1,56 @@
+{
+    "series": [
+       {
+          "columns": [
+             "time",
+             "etiqueta",
+             "clasificador",
+             "relevancias",
+             "info_adicional"
+          ],
+          "name": "Etiquetas",
+          "values": [
+             [
+                "2013-03-02T13:00:00Z",
+                "0",
+                "none",
+                {
+                   "ce":0,
+                   "temp":0,
+                   "pres":0
+                },
+                "No se ha etiquetado"
+ 
+           
+ 
+ 
+             ],
+             [
+                "2013-03-02T14:00:00Z",
+                "1",
+                "lightgbm_or_tabnet",
+                {
+                   "ce":0.0,
+                   "temp":0.0,
+                   "pres":0.0
+                },
+                "Se entrenó el 2021-07-15T14:19:00Z con 13000 datos correspondientes al período 2021-06-15T14:19:00Z al 2021-07-15T14:19:00Z"
+ 
+             ],
+             [
+                "2013-03-02T15:00:00Z",
+                "-1",
+                "lightgbm_or_tabnet",
+                {
+                   "ce":0.33,
+                   "temp":0.33,
+                   "pres":0.33
+                },
+                "Se entrenó el 2021-07-15T14:19:00Z con 13000 datos correspondientes al período 2021-06-15T14:19:00Z al 2021-07-15T14:19:00Z"
+ 
+             ]
+             ]
+                     ]
+          ]
+       }
+    }
