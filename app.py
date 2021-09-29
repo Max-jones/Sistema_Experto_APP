@@ -127,7 +127,8 @@ def map(data, lat, lon, zoom):
 with st.beta_expander('Consultar Información de estación en la base de datos'):
     selected_estacion =st.selectbox(
         'Seleccione una estación',
-        ('7','1'))
+        ('7','1')
+        )
 
     r=get_info_estacion(selected_estacion)
     # _json=get_all_data(selected_estacion)
@@ -148,7 +149,8 @@ with st.beta_expander('Consultar Información de estación en la base de datos')
 uploaded_file = st.file_uploader("Selecciona un archivo .csv ")
 
 while uploaded_file is not None:
-    df = pd.read_csv(uploaded_file,engine='python')
+    df = pd.read_csv(uploaded_file,header=0,engine='python')
+    df
     df['Date_Time'] = pd.to_datetime(df['Date_Time'])#,format='%Y-%m-%d %H:%m:%S')
     df.set_index('Date_Time', inplace=True)
     chile=pytz.timezone('Chile/Continental')
