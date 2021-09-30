@@ -86,17 +86,8 @@ def load_data(path):
 #     return r.json() 
 
 # import json
-icon_url='https://www.pngrepo.com/png/276095/180/well.png'
-icon_data = {
-    # Icon from Wikimedia, used the Creative Commons Attribution-Share Alike 3.0
-    # Unported, 2.5 Generic, 2.0 Generic and 1.0 Generic licenses
-    "url": icon_url,
-    "width": 242,
-    "height": 242,
-    "anchorY": 242,
-}
-def map(data, lat, lon, zoom):
 
+def map(data, lat, lon, zoom):
     st.write(pdk.Deck(
         map_style='mapbox://styles/mapbox/outdoors-v11',
         initial_view_state={
@@ -108,17 +99,15 @@ def map(data, lat, lon, zoom):
         tooltip={"text": "Horcón {}, {}\n Mediciones disponibles: \n CE, Temp, Nivel".format(lat,lon)},
         layers=[
             pdk.Layer(
-                type="IconLayer",
+                "HexagonLayer",
                 data=data,
                 get_position=["lon", "lat"],
-                get_icon="icon_data",
-                get_size=4,
-                size_scale=15,
-                # elevation_scale=4,
-                # elevation_range=[0, 1000],
+                radius=20,
+                elevation_scale=4,
+                elevation_range=[0, 1000],
                 pickable=True,
-                # extruded=True,
-                # colorRange=[[237,248,251],[191,211,230],[158,188,218],[140,150,198],[136,86,167],[129,15,124]]
+                extruded=True,
+                colorRange=[[237,248,251],[191,211,230],[158,188,218],[140,150,198],[136,86,167],[129,15,124]]
             )
         ]
     ))
