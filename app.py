@@ -34,58 +34,32 @@ import pytz
 # SETTING PAGE CONFIG TO WIDE MODE
 st.set_page_config(
     layout="wide",
-    page_title='Plataforma Abierta - Sistema Experto',
-    page_icon='🌊'
+    page_title='Plataforma automática para detección de anomalías',
+    page_icon='🚀',
+    initial_sidebar_state="expanded",
     )
-
 
 # LOADING LOCAL DATA IF EXISTS.
 local_path = 'C:\\Users\elmha\OneDrive - Universidad de Chile\Magíster\Tesis\Sistema-Experto\Data\processed/dataframe.csv'
 
-url_queries = 'http://agua.niclabs.cl/queries'
-
-api_key_header = {'query-api-key': '919c5e5e086a492398141c1ebd95b711'}
 
 @st.cache(persist=True)
 
-# def load_data(path):
-#     '''
-#     ARGS: path to the local .csv file
-#     Load data and search for the Date_Time column to index the dataframe by a datetime value.
+def load_data(path):
+    '''
+    ARGS: path to the local .csv file
+    Load data and search for the Date_Time column to index the dataframe by a datetime value.
 
-#     '''
-#     data = pd.read_csv(path)
-#     data['Date_Time'] = pd.to_datetime(data['Date_Time'])
-#     data.set_index('Date_Time', inplace=True)
-#     chile=pytz.timezone('Chile/Continental')
-#     data.index = data.index.tz_localize(pytz.utc).tz_convert(chile)
-#     return data
+    '''
+    data = pd.read_csv(path)
+    data['Date_Time'] = pd.to_datetime(data['Date_Time'])
+    data.set_index('Date_Time', inplace=True)
+    chile=pytz.timezone('Chile/Continental')
+    data.index = data.index.tz_localize(pytz.utc).tz_convert(chile)
+    return data
 
 # CREATING FUNCTION FOR MAPS
 
-def get_info_estacion(estacion):
-    '''
-    ARGS: id estación
-    Returns the Json Info file.
-    
-    '''
-    url = url_queries + '/infoestacion'
-    payload = {'estacion':str(estacion)}
-    r = requests.get(url,params=payload,headers=api_key_header)
-    return r.json()
-
-def get_all_data(estacion):
-    '''
-    ARGS: id estación
-    Returns all de the data into a dataframe.
-    
-    '''
-    url = url_queries + '/dataestaciones'
-    payload = {'estacion':str(estacion)}
-    r = requests.get(url,params=payload,headers=api_key_header)
-    return r.json() 
-
-import json
 
 def map(data, lat, lon, zoom):
     st.write(pdk.Deck(
@@ -124,27 +98,9 @@ def map(data, lat, lon, zoom):
 
 '''
 
-with st.beta_expander('Consultar Información de estación en la base de datos'):
-    selected_estacion =st.selectbox(
-        'Seleccione una estación',
-        ('7','1'))
-
-    r=get_info_estacion(selected_estacion)
-    # _json=get_all_data(selected_estacion)
-
-    # the json file where the output must be stored 
-    # out_file = open("myfile.json", "w")
-    # json.dump(r2, out_file, indent = 3)  
-    # df_dict=[{'timestamp':item[]}]
-    df = pd.DataFrame(r)
-    st.write(df)
-
-
-
-
 # Sección de carga del archivo .csv
 
-# Widget para cargar el archivo
+    # Widget para cargar el archivo
 uploaded_file = st.file_uploader("Selecciona un archivo .csv ")
 
 while uploaded_file is not None:
