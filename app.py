@@ -31,6 +31,8 @@ from streamlit.proto.DataFrame_pb2 import DataFrame
 import plotly.graph_objects as go
 import requests
 import pytz
+import time
+import random
 
 from streamlit_pandas_profiling import st_profile_report
 
@@ -47,14 +49,14 @@ st.set_page_config(
 local_path = 'C:\\Users\elmha\OneDrive - Universidad de Chile\Magíster\Tesis\Sistema-Experto\Data\processed/dataframe.csv'
 
 
-@st.cache
+# @st.cache
 def load_data(path):
     '''
     ARGS: path to the local .csv file
     Load data and search for the Date_Time column to index the dataframe by a datetime value.
 
     '''
-    data = pd.read_csv(path, engine='python')
+    data = pd.read_csv(path,sep=",")#, engine='python')
     data['Date_Time'] = pd.to_datetime(data['Date_Time'])
     data.set_index('Date_Time', inplace=True)
     chile=pytz.timezone('Chile/Continental')
@@ -110,13 +112,14 @@ st.sidebar.write(
     # Widget para cargar el archivo
 uploaded_file = st.sidebar.file_uploader("Selecciona un archivo .csv ")
 
-while uploaded_file is not None:
+if uploaded_file is not None:
+    uploaded_file.seek(0)
+    ds=load_data(uploaded_file)
 
-    datas=load_data(uploaded_file)
     st.sidebar.write("**Se ha cargado un archivo.**")
-    columns_names_list = datas.columns.to_list()
+    columns_names_list = ds.columns.to_list()
     st.sidebar.write(columns_names_list)
-    st.sidebar.write(type(columns_names_list))
+    # st.sidebar.write(type(columns_names_list))
     selected_features = st.sidebar.multiselect('Seleccione las columnas que contienen nombres de características', columns_names_list)
 
 
@@ -125,18 +128,19 @@ while uploaded_file is not None:
     # '''
     if st.sidebar.button('Seleccionar columnas'):
 
-        if st.button('Generar reporte'):
-            with st.spinner("Training ongoing"):       
-                delay(1000)
-        with st.beta_expander("Mostrar Dataset Completo"):
-                    st.write(datas,use_container_width=True)
-                    pr = datas['selected'].profile_report()
+        # if st.button('Generar reporte'):
+        #     with st.spinner("Training ongoing"):       
+        #         time.sleep(3)
+        with st.beta_expander("Mostrar Dataset Completo",expanded=True):
+                    selected_df = ds[selected_features]
+                    st.write(selected_df)#use_container_width=True)
+                    pr = selected_df.profile_report()
 
                     st_profile_report(pr)
-    '''
-    ## Gráficos por variable
+    # '''
+    # ## Gráficos por variable
 
-    '''
+    # '''
 
     # p = datas.loc[datas['Etiqueta P'] == 1] #anomaly
 
