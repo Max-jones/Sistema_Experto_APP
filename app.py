@@ -168,22 +168,22 @@ if uploaded_file is not None:
         st.sidebar.write("Las preguntas anteriores son obligatorias.")  
 
 
-    ready = st.sidebar.button("Comenzar!")
+    # ready = st.sidebar.button("Comenzar!")
 
-    if ready:
+    # if ready:
 
-        if selected_features != []:
-            if st.button("Mostrar un reporte exploratorio inicial"):
+        # if selected_features != []:
+    if st.button("Mostrar un reporte exploratorio inicial"):
 
-                # if st.button('Generar reporte'):
-                #     with st.spinner("Training ongoing"):
-                #         time.sleep(3)
-                with st.beta_expander("🕵️ Mostrar un reporte exploratorio inicial 📃", expanded=True):
-                    selected_df = ds[selected_features]
-                    st.write(selected_df)  # use_container_width=True)
-                    pr = selected_df.profile_report()
+        # if st.button('Generar reporte'):
+        #     with st.spinner("Training ongoing"):
+        #         time.sleep(3)
+        # with st.beta_expander("🕵️ Mostrar un reporte exploratorio inicial 📃", expanded=True):
+        selected_df = ds[selected_features]
+        st.write(selected_df)  # use_container_width=True)
+        pr = selected_df.profile_report()
 
-                    st_profile_report(pr)
-        else:
-            st.write('🚧 Por favor seleccione primero las variables a analizar 🚧. ')
+        st_profile_report(pr)
+        # else:
+        #     st.write('🚧 Por favor seleccione primero las variables a analizar 🚧. ')
     
