@@ -90,8 +90,6 @@ def map(data, lat, lon, zoom):
             )
         ]
     ))
-# with st.sidebar():
-    # self.sidebar.radio('El d',[1,2,3,4])
 # LAYING OUT THE TOP SECTION OF THE APP
 
 
@@ -103,7 +101,7 @@ def map(data, lat, lon, zoom):
 st.sidebar.write('# Menu de pre-configuración')
 st.sidebar.write(
 '''
-## Cargar el dataset a procesar
+## 1 Cargar el dataset a procesar
 '''
 )
 
@@ -121,7 +119,9 @@ if uploaded_file is not None:
     st.sidebar.write(columns_names_list)
     # st.sidebar.write(type(columns_names_list))
     selected_features = st.sidebar.multiselect('Seleccione las columnas que contienen nombres de características', columns_names_list)
-
+    supervised = st.sidebar.selectbox('¿El dataset posee etiquetas?',["Sí","No"],help="Esta pregunta se refiere si la base de datos cargada contiene una columna con la información si los datos han sido etiquetados previamente como datos normales y anómalos.")
+    if supervised=="Sí":
+        st.sidebar.selectbox('Ingrese el nombre de la columna que contiene las etiquetas.',columns_names_list,help="Esta columna debe ser de tipo binario. Donde 0 corresponde a un dato normal y 1 a una medición anómala.")
 
     # '''
     # ## Dataset Seleccionado
