@@ -57,10 +57,10 @@ def load_data(path):
 
     """
     data = pd.read_csv(path,delimiter=";")  # , engine='python')
-    # data["Date_Time"] = pd.to_datetime(data["Date_Time"])
-    # data.set_index("Date_Time", inplace=True)
-    # chile = pytz.timezone("Chile/Continental")
-    # data.index = data.index.tz_localize(pytz.utc).tz_convert(chile)
+    data["Date_Time"] = pd.to_datetime(data["Date_Time"])
+    data.set_index("Date_Time", inplace=True)
+    chile = pytz.timezone("Chile/Continental")
+    data.index = data.index.tz_localize(pytz.utc).tz_convert(chile)
     return data
 
 
@@ -150,6 +150,7 @@ if uploaded_file is not None:
         " Seleccione las características",
         columns_names_list,
     )
+    
     # Widget de consulta si el dataset contiene etiquetas.
     supervised = st.sidebar.selectbox(
         "¿El dataset posee etiquetas?",
