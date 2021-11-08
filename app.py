@@ -17,7 +17,6 @@
 
 import streamlit as st
 import pandas as pd
-import pandas_profiling
 
 import numpy as np
 import altair as alt
@@ -29,10 +28,8 @@ import seaborn as sns
 import lightgbm as lgbm
 from streamlit.proto.DataFrame_pb2 import DataFrame
 import plotly.graph_objects as go
-import requests
 import pytz
-import time
-import random
+
 
 from streamlit_pandas_profiling import st_profile_report
 
@@ -46,7 +43,7 @@ st.set_page_config(
 )
 
 # LOADING LOCAL DATA IF EXISTS.
-local_path = "C:\\Users\elmha\OneDrive - Universidad de Chile\Magíster\Tesis\Sistema-Experto\Data\processed/dataframe.csv"
+# local_path = "C:\\Users\elmha\OneDrive - Universidad de Chile\Magíster\Tesis\Sistema-Experto\Data\processed/dataframe.csv"
 
 
 # @st.cache
