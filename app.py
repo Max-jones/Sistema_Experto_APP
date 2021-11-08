@@ -184,4 +184,5 @@ if uploaded_file is not None:
         st_profile_report(pr)
         # else:
         #     st.write('🚧 Por favor seleccione primero las variables a analizar 🚧. ')
-    
+# %% imfrom
+
