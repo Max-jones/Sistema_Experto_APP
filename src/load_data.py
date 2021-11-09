@@ -9,7 +9,7 @@ from load_local_data import load_data
 # DATA_FOLDER = os.path.dirname(os.path.abspath(__file__))[:-9] #without notebooks
 csv_file = config.TRAINING_FILE
 df = load_data(csv_file)
-print(df.head())
+# print(df.head())
 
 
 # df.head()
