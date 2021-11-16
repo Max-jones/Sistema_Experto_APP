@@ -15,23 +15,50 @@
 
 # %% Imports -> requeriments.txt
 
+# Funcionalidades de la aplicación
 import streamlit as st
-import pandas as pd
+from streamlit_pandas_profiling import st_profile_report
 
-import numpy as np
-import altair as alt
-import pydeck as pdk
-from bokeh.plotting import figure
-import plotly.figure_factory as ff
-import plotly.express as px
+
+# import pandas_profiling
+
+# Manejo de datos
+import pandas as pd
+import numpy as np ##
+import altair as alt ##
+import pydeck as pdk ##
+
+
 import seaborn as sns
-import lightgbm as lgbm
-from streamlit.proto.DataFrame_pb2 import DataFrame
-import plotly.graph_objects as go
+
+# from streamlit.proto.DataFrame_pb2 import DataFrame
+
+# Manejo del tiempo
 import pytz
 
 
-from streamlit_pandas_profiling import st_profile_report
+# Visualización
+import matplotlib.pyplot as plt
+# import plotly.graph_objects as go
+# import plotly.figure_factory as ff
+# import plotly.express as px
+from bokeh.plotting import figure
+
+# Clasificadores 
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
+from sklearn.linear_model import LogisticRegression
+
+# import lightgbm as lgbm
+# import xgboost as xgb
+
+# Model Selection
+from sklearn.model_selection import TimeSeriesSplit, KFold
+from sklearn.metrics import accuracy_score, log_loss
 
 ### Initial Confiugurations
 # SETTING PAGE CONFIG TO WIDE MODE
@@ -46,7 +73,7 @@ st.set_page_config(
 # local_path = "C:\\Users\elmha\OneDrive - Universidad de Chile\Magíster\Tesis\Sistema-Experto\Data\processed/dataframe.csv"
 
 
-# @st.cache
+@st.cache
 def load_data(path):
     """
     ARGS: path to the local .csv file
@@ -60,48 +87,28 @@ def load_data(path):
     data.index = data.index.tz_localize(pytz.utc).tz_convert(chile)
     return data
 
+def show_cv_iterations(n_splits, X, y, timeseries=True):
+    # https://medium.com/@soumyachess1496/cross-validation-in-time-series-566ae4981ce4
+    if timeseries:
+        cv = TimeSeriesSplit(n_splits)
+    else:
+        cv = KFold(n_splits)
+    
+    figure, ax = plt.subplots(figsize=(10, 5))
 
-# CREATING FUNCTION FOR MAPS
-
-
-def map(data, lat, lon, zoom):
-    st.write(
-        pdk.Deck(
-            map_style="mapbox://styles/mapbox/outdoors-v11",
-            initial_view_state={
-                "latitude": lat,
-                "longitude": lon,
-                "zoom": zoom,
-                "pitch": 50,
-            },
-            tooltip={
-                "text": "Horcón {}, {}\n Mediciones disponibles: \n CE, Temp, Nivel".format(
-                    lat, lon
-                )
-            },
-            layers=[
-                pdk.Layer(
-                    "HexagonLayer",
-                    data=data,
-                    get_position=["lon", "lat"],
-                    radius=20,
-                    elevation_scale=4,
-                    elevation_range=[0, 1000],
-                    pickable=True,
-                    extruded=True,
-                    colorRange=[
-                        [237, 248, 251],
-                        [191, 211, 230],
-                        [158, 188, 218],
-                        [140, 150, 198],
-                        [136, 86, 167],
-                        [129, 15, 124],
-                    ],
-                )
-            ],
+    for ii, (tr, tt) in enumerate(cv.split(X, y)):
+        
+        p1 = ax.scatter(tr, [ii] * len(tr), c='black', marker="_", lw=8)
+        p2 = ax.scatter(tt, [ii] * len(tt), c='red', marker="_", lw=8)
+        ax.set(
+            title="Behavior of TimeseriesSplit",
+            xlabel="Data Index",
+            ylabel="CV Iteration",
+            ylim=[5, -1],
         )
-    )
-
+        ax.legend([p1, p2], ["Training", "Validation"])
+    st.pyplot(fig=figure)
+    return cv
 
 # LAYING OUT THE TOP SECTION OF THE APP
 
@@ -113,7 +120,7 @@ def map(data, lat, lon, zoom):
 
 st.sidebar.write("## Menu de pre-configuración")
 st.sidebar.write(
-    """
+"""
 ### 1️⃣ Cargar el dataset a procesar
 """
 )
@@ -151,7 +158,7 @@ if uploaded_file is not None:
     # Widget de consulta si el dataset contiene etiquetas.
     supervised = st.sidebar.selectbox(
         "¿El dataset posee etiquetas?",
-        ["Seleccione una opción✅","Sí", "No"],
+        ["Seleccione una opción ✔️","Sí", "No"],
         help="Esta pregunta se refiere si la base de datos cargada contiene una columna con la información si los datos han sido etiquetados previamente como datos normales y anómalos.",
     )
 
@@ -160,29 +167,85 @@ if uploaded_file is not None:
             "Ingrese el nombre de la columna que contiene las etiquetas.",
             columns_names_list,
             help="Esta columna debe ser de tipo binario. Donde 0 corresponde a un dato normal y 1 a una medición anómala.",
+            index=len(columns_names_list)-1
         )
 
     elif supervised == "Seleccione una opción✅":  
         st.sidebar.write("Las preguntas anteriores son obligatorias.")  
 
 
-    # ready = st.sidebar.button("Comenzar!")
+    ready = st.sidebar.button("Comenzar!")
 
-    # if ready:
-
-        # if selected_features != []:
-    if st.button("Mostrar un reporte exploratorio inicial"):
-
-        # if st.button('Generar reporte'):
-        #     with st.spinner("Training ongoing"):
-        #         time.sleep(3)
-        # with st.beta_expander("🕵️ Mostrar un reporte exploratorio inicial 📃", expanded=True):
+    if ready:
+ 
         selected_df = ds[selected_features]
-        st.write(selected_df)  # use_container_width=True)
-        pr = selected_df.profile_report()
+        
+        if st.button("Generar un reporte exploratorio inicial 🕵️"):
 
-        st_profile_report(pr)
-        # else:
-        #     st.write('🚧 Por favor seleccione primero las variables a analizar 🚧. ')
-# %% imfrom
+            # if st.button('Generar reporte'):
+            #     with st.spinner("Training ongoing"):
+            #         time.sleep(3)
+            # with st.beta_expander("🕵️ Mostrar un reporte exploratorio inicial 📃", expanded=True):
+        
+            # st.write(selected_df)  # use_container_width=True)
+            pr = selected_df.profile_report()
+            # profile = ProfileReport(pr, title="Pandas Profiling Report")
 
+            st_profile_report(pr)
+            # else:
+            #     st.write('🚧 Por favor seleccione primero las variables a analizar 🚧. ')
+# %% Separación de los conjuntos de entrenamiento y validación
+    
+            
+        X = selected_df
+        y = ds[target]
+        st.header('Entrenamiento de modelos')
+        # st.write(X)
+        # st.write(y)
+        tscv = show_cv_iterations(5,X,y)
+# %% Comparación de modelos
+        suppervised_classifiers = [
+            KNeighborsClassifier(3),
+            SVC(probability=True),
+            DecisionTreeClassifier(),
+            RandomForestClassifier(),
+            AdaBoostClassifier(),
+            GradientBoostingClassifier(),
+            GaussianNB(),
+            LinearDiscriminantAnalysis(),
+            QuadraticDiscriminantAnalysis(),
+            LogisticRegression()]
+        
+        
+        log_cols = ["Classifier", "Accuracy"]
+        log 	 = pd.DataFrame(columns=log_cols)
+
+        acc_dict = {}
+
+        for train_index, test_index in tscv.split(X):
+            print("TRAIN:", train_index, "TEST:", test_index)
+            X_train, X_test = X.values[train_index], X.values[test_index]
+            y_train, y_test = y.values[train_index], y.values[test_index]
+
+            for clf in suppervised_classifiers:
+                name = clf.__class__.__name__
+                clf.fit(X_train, y_train)
+                train_predictions = clf.predict(X_test)
+                acc = accuracy_score(y_test, train_predictions)
+                if name in acc_dict:
+                    acc_dict[name] += acc
+                else:
+                    acc_dict[name] = acc
+
+        for clf in acc_dict:
+            acc_dict[clf] = acc_dict[clf] / 10.0
+            log_entry = pd.DataFrame([[clf, acc_dict[clf]]], columns=log_cols)
+            log = log.append(log_entry)
+        
+        plt.xlabel('Accuracy')
+        plt.title('Classifier Accuracy')
+
+        results_fig = plt.figure()
+        sns.set_color_codes("muted")
+        sns.barplot(x='Accuracy', y='Classifier', data=log, color="b")
+        st.pyplot(results_fig)
