@@ -1,3 +1,9 @@
+<<<<<<< Updated upstream
 {
     "python.pythonPath": "C:\\Users\\elmha\\anaconda3\\envs\\Sistema-Experto\\python.exe"
+=======
+{
+    "python.pythonPath": "C:\\Users\\elmha\\anaconda3\\envs\\Sistema-Experto\\python.exe",
+    "jupyter.jupyterServerType": "local"
+>>>>>>> Stashed changes
 }
