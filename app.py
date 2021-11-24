@@ -53,8 +53,8 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
 from sklearn.linear_model import LogisticRegression
 
-# import lightgbm as lgbm
-# import xgboost as xgb
+import lightgbm as lgbm
+import xgboost as xgb
 
 # Model Selection
 from sklearn.model_selection import TimeSeriesSplit, KFold
@@ -204,6 +204,7 @@ if uploaded_file is not None:
         # st.write(y)
         tscv = show_cv_iterations(5,X,y)
 # %% Comparación de modelos
+
         suppervised_classifiers = [
             KNeighborsClassifier(3),
             SVC(probability=True),
@@ -215,7 +216,7 @@ if uploaded_file is not None:
             LinearDiscriminantAnalysis(),
             QuadraticDiscriminantAnalysis(),
             LogisticRegression()]
-        
+
         
         log_cols = ["Classifier", "Accuracy"]
         log 	 = pd.DataFrame(columns=log_cols)
@@ -228,6 +229,7 @@ if uploaded_file is not None:
             y_train, y_test = y.values[train_index], y.values[test_index]
 
             for clf in suppervised_classifiers:
+                # plo
                 name = clf.__class__.__name__
                 clf.fit(X_train, y_train)
                 train_predictions = clf.predict(X_test)
@@ -249,3 +251,4 @@ if uploaded_file is not None:
         sns.set_color_codes("muted")
         sns.barplot(x='Accuracy', y='Classifier', data=log, color="b")
         st.pyplot(results_fig)
+    
