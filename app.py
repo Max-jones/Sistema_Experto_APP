@@ -16,7 +16,9 @@
 # %% Imports -> requeriments.txt
 
 # Funcionalidades de la aplicación
+from numpy.lib.function_base import select
 import streamlit as st
+import pandas_profiling
 from streamlit_pandas_profiling import st_profile_report
 
 
@@ -56,9 +58,14 @@ from sklearn.linear_model import LogisticRegression
 import lightgbm as lgbm
 import xgboost as xgb
 
+
 # Model Selection
 from sklearn.model_selection import TimeSeriesSplit, KFold
 from sklearn.metrics import accuracy_score, log_loss
+
+# Automated Classification
+
+from pycaret.classification import *
 
 ### Initial Confiugurations
 # SETTING PAGE CONFIG TO WIDE MODE
@@ -179,76 +186,93 @@ if uploaded_file is not None:
     if ready:
  
         selected_df = ds[selected_features]
+        if supervised == 'Sí':
+            selected_df['target'] = ds[target]
         
-        if st.button("Generar un reporte exploratorio inicial 🕵️"):
+        complete_df = selected_df
+        
+        # if st.button("Generar un reporte exploratorio inicial 🕵️"):
 
             # if st.button('Generar reporte'):
             #     with st.spinner("Training ongoing"):
             #         time.sleep(3)
-            # with st.beta_expander("🕵️ Mostrar un reporte exploratorio inicial 📃", expanded=True):
+        with st.beta_expander("🕵️ Mostrar un reporte exploratorio preliminar 📃", expanded=False):
         
             # st.write(selected_df)  # use_container_width=True)
-            pr = selected_df.profile_report()
-            # profile = ProfileReport(pr, title="Pandas Profiling Report")
+            pr = complete_df.profile_report()
+            # profile = ProfileReport(pr, title="Reporte de exploración de datos")
 
             st_profile_report(pr)
             # else:
             #     st.write('🚧 Por favor seleccione primero las variables a analizar 🚧. ')
 # %% Separación de los conjuntos de entrenamiento y validación
     
-            
-        X = selected_df
-        y = ds[target]
-        st.header('Entrenamiento de modelos')
-        # st.write(X)
-        # st.write(y)
-        tscv = show_cv_iterations(5,X,y)
+
+
+        pycaret_s = setup(complete_df, target = 'target', session_id = 123, silent = True, use_gpu = True, profile = False)     
+        # model training and selection
+        best = compare_models(sort='F1')#,n_select=3)
+        score_grid = pull()
+        st.write('Los mejores clasificador fueron:')
+        st.write(score_grid)
+        
+        plot_model(best,plot = 'class_report',display_format='streamlit')
+        plot_model(best,plot = 'confusion_matrix',display_format='streamlit')
+        plot_model(best,plot = 'error', display_format='streamlit')
+        plot_model(best,display_format='streamlit')
+
+        # X = selected_df
+        # y = ds[target]
+        # st.header('Entrenamiento de modelos')
+        # # st.write(X)
+        # # st.write(y)
+        # tscv = show_cv_iterations(5,X,y)
 # %% Comparación de modelos
 
-        suppervised_classifiers = [
-            KNeighborsClassifier(3),
-            SVC(probability=True),
-            DecisionTreeClassifier(),
-            RandomForestClassifier(),
-            AdaBoostClassifier(),
-            GradientBoostingClassifier(),
-            GaussianNB(),
-            LinearDiscriminantAnalysis(),
-            QuadraticDiscriminantAnalysis(),
-            LogisticRegression()]
+        # suppervised_classifiers = [
+        #     KNeighborsClassifier(3),
+        #     SVC(probability=True),
+        #     DecisionTreeClassifier(),
+        #     RandomForestClassifier(),
+        #     AdaBoostClassifier(),
+        #     GradientBoostingClassifier(),
+        #     GaussianNB(),
+        #     LinearDiscriminantAnalysis(),
+        #     QuadraticDiscriminantAnalysis(),
+        #     LogisticRegression()]
 
         
-        log_cols = ["Classifier", "Accuracy"]
-        log 	 = pd.DataFrame(columns=log_cols)
+        # log_cols = ["Classifier", "Accuracy"]
+        # log 	 = pd.DataFrame(columns=log_cols)
 
-        acc_dict = {}
+        # acc_dict = {}
 
-        for train_index, test_index in tscv.split(X):
-            print("TRAIN:", train_index, "TEST:", test_index)
-            X_train, X_test = X.values[train_index], X.values[test_index]
-            y_train, y_test = y.values[train_index], y.values[test_index]
+        # for train_index, test_index in tscv.split(X):
+        #     print("TRAIN:", train_index, "TEST:", test_index)
+        #     X_train, X_test = X.values[train_index], X.values[test_index]
+        #     y_train, y_test = y.values[train_index], y.values[test_index]
 
-            for clf in suppervised_classifiers:
-                # plo
-                name = clf.__class__.__name__
-                clf.fit(X_train, y_train)
-                train_predictions = clf.predict(X_test)
-                acc = accuracy_score(y_test, train_predictions)
-                if name in acc_dict:
-                    acc_dict[name] += acc
-                else:
-                    acc_dict[name] = acc
+        #     for clf in suppervised_classifiers:
+        #         # plo
+        #         name = clf.__class__.__name__
+        #         clf.fit(X_train, y_train)
+        #         train_predictions = clf.predict(X_test)
+        #         acc = accuracy_score(y_test, train_predictions)
+        #         if name in acc_dict:
+        #             acc_dict[name] += acc
+        #         else:
+        #             acc_dict[name] = acc
 
-        for clf in acc_dict:
-            acc_dict[clf] = acc_dict[clf] / 10.0
-            log_entry = pd.DataFrame([[clf, acc_dict[clf]]], columns=log_cols)
-            log = log.append(log_entry)
+        # for clf in acc_dict:
+        #     acc_dict[clf] = acc_dict[clf] / 10.0
+        #     log_entry = pd.DataFrame([[clf, acc_dict[clf]]], columns=log_cols)
+        #     log = log.append(log_entry)
         
-        plt.xlabel('Accuracy')
-        plt.title('Classifier Accuracy')
+        # plt.xlabel('Accuracy')
+        # plt.title('Classifier Accuracy')
 
-        results_fig = plt.figure()
-        sns.set_color_codes("muted")
-        sns.barplot(x='Accuracy', y='Classifier', data=log, color="b")
-        st.pyplot(results_fig)
+        # results_fig = plt.figure()
+        # sns.set_color_codes("muted")
+        # sns.barplot(x='Accuracy', y='Classifier', data=log, color="b")
+        # st.pyplot(results_fig)
     
