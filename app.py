@@ -117,6 +117,14 @@ def show_cv_iterations(n_splits, X, y, timeseries=True):
     st.pyplot(fig=figure)
     return cv
 
+@st.cache
+def entrenar_modelos(df, etiqueta, metrica):
+
+    # setup
+    pycaret_s = setup(df, target = etiqueta, session_id = 123, silent = True, use_gpu = True, profile = False)     
+    # model training and selection
+    best = compare_models(sort= metrica)#,n_select=3)
+    return best
 # LAYING OUT THE TOP SECTION OF THE APP
 
 
@@ -138,6 +146,7 @@ st.sidebar.write(
 uploaded_file = st.sidebar.file_uploader("Selecciona un archivo .csv ")
 
 # La aplicación comienza cuando se carga un archivo.
+
 if uploaded_file is not None:
     uploaded_file.seek(0)
 
@@ -208,10 +217,10 @@ if uploaded_file is not None:
 # %% Separación de los conjuntos de entrenamiento y validación
     
 
-
-        pycaret_s = setup(complete_df, target = 'target', session_id = 123, silent = True, use_gpu = True, profile = False)     
+        best = entrenar_modelos(complete_df, 'target', 'F1')
+        # pycaret_s = setup(complete_df, target = 'target', session_id = 123, silent = True, use_gpu = True, profile = False)     
         # model training and selection
-        best = compare_models(sort='F1')#,n_select=3)
+        # best = compare_models(sort='F1')#,n_select=3)
         score_grid = pull()
         st.write('Los mejores clasificador fueron:')
         st.write(score_grid)
@@ -220,6 +229,8 @@ if uploaded_file is not None:
         plot_model(best,plot = 'confusion_matrix',display_format='streamlit')
         plot_model(best,plot = 'error', display_format='streamlit')
         plot_model(best,display_format='streamlit')
+        
+        leaderboard = get_leaderboard()
 
         # X = selected_df
         # y = ds[target]
