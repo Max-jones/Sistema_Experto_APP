@@ -205,7 +205,7 @@ if uploaded_file is not None:
             # if st.button('Generar reporte'):
             #     with st.spinner("Training ongoing"):
             #         time.sleep(3)
-        with st.beta_expander("🕵️ Mostrar un reporte exploratorio preliminar 📃", expanded=False):
+        with st.expander("🕵️ Mostrar un reporte exploratorio preliminar 📃", expanded=False):
         
             # st.write(selected_df)  # use_container_width=True)
             pr = complete_df.profile_report()
@@ -221,16 +221,21 @@ if uploaded_file is not None:
         # pycaret_s = setup(complete_df, target = 'target', session_id = 123, silent = True, use_gpu = True, profile = False)     
         # model training and selection
         # best = compare_models(sort='F1')#,n_select=3)
-        score_grid = pull()
+        # score_grid = pull()
         st.write('Los mejores clasificador fueron:')
-        st.write(score_grid)
+        save_model(best, 'app_best')
+        # st.write(score_grid)
         
         plot_model(best,plot = 'class_report',display_format='streamlit')
         plot_model(best,plot = 'confusion_matrix',display_format='streamlit')
         plot_model(best,plot = 'error', display_format='streamlit')
         plot_model(best,display_format='streamlit')
         
+        
         leaderboard = get_leaderboard()
+        st.write('Dashboard Resultados:')
+        ds = dashboard(best, display_format='inline')
+
 
         # X = selected_df
         # y = ds[target]
