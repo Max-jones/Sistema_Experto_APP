@@ -9,7 +9,7 @@ plotly==5.4.0
 pycaret==2.3.6
 pydeck==0.6.2
 pytz==2021.1
-scikit_learn==1.0.2
+scikit_learn==0.23.2
 seaborn==0.11.1
 streamlit==1.4.0
 streamlit_pandas_profiling==0.1.2
