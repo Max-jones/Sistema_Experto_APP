@@ -222,7 +222,7 @@ if uploaded_file is not None:
         # model training and selection
         # best = compare_models(sort='F1')#,n_select=3)
         # score_grid = pull()
-        st.write('Los mejores clasificador fueron:')
+        st.write('# Los mejores clasificador fueron:')
         save_model(best, 'app_best')
         # st.write(score_grid)
         
@@ -233,8 +233,8 @@ if uploaded_file is not None:
         
         
         leaderboard = get_leaderboard()
-        st.write('Dashboard Resultados:')
-        ds = dashboard(best, display_format='inline')
+        # st.write('Dashboard Resultados:')
+        # ds = dashboard(best, display_format='inline')
 
 
         # X = selected_df
