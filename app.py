@@ -57,7 +57,7 @@ from sklearn.linear_model import LogisticRegression
 
 import lightgbm as lgbm
 import xgboost as xgb
-
+import time
 
 # Model Selection
 from sklearn.model_selection import TimeSeriesSplit, KFold
@@ -117,14 +117,33 @@ def show_cv_iterations(n_splits, X, y, timeseries=True):
     st.pyplot(fig=figure)
     return cv
 
-@st.cache
-def entrenar_modelos(df, etiqueta, metrica):
+# @st.cache
+def entrenar_modelos(df, etiqueta, metrica, ensamble=True):
 
     # setup
     pycaret_s = setup(df, target = etiqueta, session_id = 123, silent = True, use_gpu = True, profile = False)     
     # model training and selection
-    best = compare_models(sort= metrica)#,n_select=3)
-    return best
+    if ensamble:
+        top5 = compare_models(n_select = 5) 
+        # tune top 5 base models
+        grid_a=pull()
+        tuned_top5 = [tune_model(i,fold = 5, optimize='F1',search_library='scikit-optimize') for i in top5]
+        grid_b=pull()
+        stacker = stack_models(estimator_list = top5[1:], meta_model = top5[0])
+
+        # 
+        return (stacker, grid_a, grid_b)
+    else:
+        best = compare_models(sort= metrica, n_select=3)
+        grid = pull()
+        return (best, grid, grid)
+
+from pycaret.classification import load_model
+def cargar_modelo(df,modelo):
+    modelo = load_model('stack inicial')
+    
+    return (modelo, grid)
+
 # LAYING OUT THE TOP SECTION OF THE APP
 
 
@@ -165,6 +184,7 @@ if uploaded_file is not None:
     """
     ### 2️⃣ Seleccione los nombres de las columnas que contienen características
     """)
+    
 
     selected_features = st.sidebar.multiselect(
         " Seleccione las características",
@@ -199,12 +219,14 @@ if uploaded_file is not None:
             selected_df['target'] = ds[target]
         
         complete_df = selected_df
+       
         
         # if st.button("Generar un reporte exploratorio inicial 🕵️"):
 
             # if st.button('Generar reporte'):
             #     with st.spinner("Training ongoing"):
             #         time.sleep(3)
+        st.write('## Análisis exploratorio estadístico y visual de los datos cargados: ')
         with st.expander("🕵️ Mostrar un reporte exploratorio preliminar 📃", expanded=False):
         
             # st.write(selected_df)  # use_container_width=True)
@@ -214,22 +236,46 @@ if uploaded_file is not None:
             st_profile_report(pr)
             # else:
             #     st.write('🚧 Por favor seleccione primero las variables a analizar 🚧. ')
-# %% Separación de los conjuntos de entrenamiento y validación
-    
+        # else:
+        #     pass
+            
 
-        best = entrenar_modelos(complete_df, 'target', 'F1')
-        # pycaret_s = setup(complete_df, target = 'target', session_id = 123, silent = True, use_gpu = True, profile = False)     
-        # model training and selection
-        # best = compare_models(sort='F1')#,n_select=3)
-        # score_grid = pull()
-        st.write('# Los mejores clasificador fueron:')
-        save_model(best, 'app_best')
+# %% Separación de los conjuntos de entrenamiento y validación
+        
+        st.write('## Detección de anomalías')
+        if supervised:
+            antes = time.time()
+            best, grid1, grid2  = entrenar_modelos(complete_df, 'target', 'F1')
+            despues = time.time()
+            delta_t = despues- antes
+            str_t = 'El entrenamiento demoró: '+str(delta_t) + ' segundos.'
+            st.write(str_t)
+            # pycaret_s = setup(complete_df, target = 'target', session_id = 123, silent = True, use_gpu = True, profile = False)     
+            # model training and selection
+            # best = compare_models(sort='F1')#,n_select=3)
+            # score_grid = pull()
+            st.write('### Grilla de búsqueda de modelos:')
+            st.write(grid2.type())
+
+            st.write('### Apilamiento de los mejors 5 modelos con mejor desempeño:')
+            st.write('# Los mejores clasificador fueron:')
+            st.write(pull())
+
+
+        # # Guardar modelos
+        # save_model(best, 'app_best')
         # st.write(score_grid)
         
         plot_model(best,plot = 'class_report',display_format='streamlit')
         plot_model(best,plot = 'confusion_matrix',display_format='streamlit')
         plot_model(best,plot = 'error', display_format='streamlit')
-        plot_model(best,display_format='streamlit')
+        plot_model(best,plot = 'pr', display_format='streamlit')
+        plot_model(best,plot = 'boundary',display_format='streamlit')
+        plot_model(best,plot = 'calibration',display_format='streamlit')
+        plot_model(best,plot = 'vc',display_format='streamlit')
+        plot_model(best,plot = 'feature',display_format='streamlit')
+        plot_model(best,plot = 'feature_all',display_format='streamlit')
+        plot_model(best,plot = 'parameter',display_format='streamlit')
         
         
         leaderboard = get_leaderboard()
@@ -243,6 +289,9 @@ if uploaded_file is not None:
         # # st.write(X)
         # # st.write(y)
         # tscv = show_cv_iterations(5,X,y)
+
+
+
 # %% Comparación de modelos
 
         # suppervised_classifiers = [
