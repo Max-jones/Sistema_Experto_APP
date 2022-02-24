@@ -200,13 +200,13 @@ if uploaded_file is not None:
     )
     
     # Widget de consulta si el dataset contiene etiquetas.
-    supervised = st.sidebar.selectbox(
+    labeled = st.sidebar.selectbox(
         "¿El dataset posee etiquetas?",
         ["Seleccione una opción ✔️","Sí", "No"],
         help="Esta pregunta se refiere si la base de datos cargada contiene una columna con la información si los datos han sido etiquetados previamente como datos normales y anómalos.",
     )
 
-    if supervised == "Sí":
+    if labeled == "Sí":
         target = st.sidebar.selectbox(
             "Ingrese el nombre de la columna que contiene las etiquetas.",
             columns_names_list,
@@ -214,7 +214,7 @@ if uploaded_file is not None:
             index=len(columns_names_list)-1
         )
 
-    elif supervised == "Seleccione una opción✅":  
+    elif labeled == "Seleccione una opción✅":  
         st.sidebar.write("Las preguntas anteriores son obligatorias.")  
 
 
@@ -223,7 +223,7 @@ if uploaded_file is not None:
     if ready:
  
         selected_df = ds[selected_features]
-        if supervised == 'Sí':
+        if labeled == 'Sí':
             selected_df['target'] = ds[target]
         
         complete_df = selected_df
@@ -251,7 +251,7 @@ if uploaded_file is not None:
 # %% Separación de los conjuntos de entrenamiento y validación
         
         st.write('## Detección de anomalías')
-        if supervised:
+        if labeled:
             antes = time.time()
             best, grid1, grid2  = entrenar_modelos(complete_df, 'target', 'F1')
             despues = time.time()
