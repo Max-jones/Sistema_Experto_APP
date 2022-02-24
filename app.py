@@ -64,7 +64,9 @@ from sklearn.model_selection import TimeSeriesSplit, KFold
 from sklearn.metrics import accuracy_score, log_loss
 
 # Automated Classification
-
+from pycaret import classification as supervised
+from pycaret import anomaly as unsupervised
+# import pycaret.anomaly as unsupervised
 
 
 ### Initial Confiugurations
@@ -119,39 +121,39 @@ def show_cv_iterations(n_splits, X, y, timeseries=True):
 
 # @st.cache
 def entrenar_modelos(df, etiqueta, metrica, ensamble=True):
-    from pycaret.classification import *
+    
 
     # setup
-    pycaret_s = setup(df, target = etiqueta, session_id = 123, silent = True, use_gpu = True, profile = False)     
+    pycaret_s = supervised.setup(df, target = etiqueta, session_id = 123, silent = True, use_gpu = True, profile = False)     
     # model training and selection
     if ensamble:
-        top5 = compare_models(n_select = 5) 
+        top5 = supervised.compare_models(n_select = 5) 
         # tune top 5 base models
-        grid_a=pull()
-        tuned_top5 = [tune_model(i,fold = 5, optimize='F1',search_library='scikit-optimize') for i in top5]
-        grid_b=pull()
-        stacker = stack_models(estimator_list = top5[1:], meta_model = top5[0])
+        grid_a= supervised.pull()
+        tuned_top5 = [supervised.tune_model(i,fold = 5, optimize='F1',search_library='scikit-optimize') for i in top5]
+        grid_b=supervised.pull()
+        stacker = supervised.stack_models(estimator_list = top5[1:], meta_model = top5[0])
 
         # 
         return (stacker, grid_a, grid_b)
     else:
-        best = compare_models(sort= metrica, n_select=3)
-        grid = pull()
+        best = supervised.compare_models(sort= metrica, n_select=3)
+        grid = supervised.pull()
         return (best, grid, grid)
     
-def deteccion_no_supervisada(df, etiqueta=None, metrica, ensamble=True):
-    
+def deteccion_no_supervisada(df, metrica, etiqueta=None,  ensamble=True):
+    return ""
 
 
 
-from pycaret.classification import load_model
+
 def cargar_modelo(df,modelo):
-    modelo = load_model('stack inicial')
+
+    modelo = supervised.load_model('stack inicial')
     
     return (modelo, grid)
 
-# LAYING OUT THE TOP SECTION OF THE APP
-
+# Creando las secciones de visualización de la aplicación
 
 # Título de la plataforma
 """
@@ -164,7 +166,7 @@ st.sidebar.write(
 ### 1️⃣ Cargar el dataset a procesar
 """
 )
-
+ 
 # Sección de carga del archivo .csv
 
 # Widget para cargar el archivo
@@ -273,7 +275,7 @@ if uploaded_file is not None:
         # st.write(score_grid)
         
         plot_model(best,plot = 'class_report',display_format='streamlit')
-        plot_model(best,plot = 'confusion_matrix',display_format='streamlit')
+        plot_model(best,plot = 'confusion_matrix',display_format='streamlit',plot_kwargs = {'percent' : True})
         plot_model(best,plot = 'error', display_format='streamlit')
         plot_model(best,plot = 'pr', display_format='streamlit')
         plot_model(best,plot = 'boundary',display_format='streamlit')
