@@ -65,7 +65,7 @@ from sklearn.metrics import accuracy_score, log_loss
 
 # Automated Classification
 
-from pycaret.classification import *
+
 
 ### Initial Confiugurations
 # SETTING PAGE CONFIG TO WIDE MODE
@@ -119,6 +119,7 @@ def show_cv_iterations(n_splits, X, y, timeseries=True):
 
 # @st.cache
 def entrenar_modelos(df, etiqueta, metrica, ensamble=True):
+    from pycaret.classification import *
 
     # setup
     pycaret_s = setup(df, target = etiqueta, session_id = 123, silent = True, use_gpu = True, profile = False)     
@@ -137,6 +138,11 @@ def entrenar_modelos(df, etiqueta, metrica, ensamble=True):
         best = compare_models(sort= metrica, n_select=3)
         grid = pull()
         return (best, grid, grid)
+    
+def deteccion_no_supervisada(df, etiqueta=None, metrica, ensamble=True):
+    
+
+
 
 from pycaret.classification import load_model
 def cargar_modelo(df,modelo):
