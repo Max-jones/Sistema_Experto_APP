@@ -145,8 +145,6 @@ def deteccion_no_supervisada(df, metrica, etiqueta=None,  ensamble=True):
     return ""
 
 
-
-
 def cargar_modelo(df,modelo):
 
     modelo = supervised.load_model('stack inicial')
@@ -264,30 +262,30 @@ if uploaded_file is not None:
             # score_grid = pull()
             st.write('### Grilla de búsqueda de modelos:')
             st.write(grid1)
-            st.write(grid2)
+            # st.write(grid2)
 
             st.write('### Apilamiento de los mejors 5 modelos con mejor desempeño:')
             st.write('# Los mejores clasificador fueron:')
-            st.write(pull())
-
+            # st.write(supervised.pull())
+            
 
         # # Guardar modelos
         # save_model(best, 'app_best')
         # st.write(score_grid)
         
-        plot_model(best,plot = 'class_report',display_format='streamlit')
-        plot_model(best,plot = 'confusion_matrix',display_format='streamlit',plot_kwargs = {'percent' : True})
-        plot_model(best,plot = 'error', display_format='streamlit')
-        plot_model(best,plot = 'pr', display_format='streamlit')
-        plot_model(best,plot = 'boundary',display_format='streamlit')
-        plot_model(best,plot = 'calibration',display_format='streamlit')
-        plot_model(best,plot = 'vc',display_format='streamlit')
-        plot_model(best,plot = 'feature',display_format='streamlit')
-        plot_model(best,plot = 'feature_all',display_format='streamlit')
-        plot_model(best,plot = 'parameter',display_format='streamlit')
+        supervised.plot_model(best,plot = 'class_report',display_format='streamlit')
+        supervised.plot_model(best,plot = 'confusion_matrix',display_format='streamlit',plot_kwargs = {'percent' : True})
+        supervised.plot_model(best,plot = 'error', display_format='streamlit')
+        supervised.plot_model(best,plot = 'pr', display_format='streamlit')
+        supervised.plot_model(best,plot = 'boundary',display_format='streamlit')
+        supervised.plot_model(best,plot = 'calibration',display_format='streamlit')
+        supervised.plot_model(best,plot = 'vc',display_format='streamlit')
+        supervised.plot_model(best,plot = 'feature',display_format='streamlit')
+        supervised.plot_model(best,plot = 'feature_all',display_format='streamlit')
+        supervised.plot_model(best,plot = 'parameter',display_format='streamlit')
         
         
-        leaderboard = get_leaderboard()
+        leaderboard = supervised.get_leaderboard()
         # st.write('Dashboard Resultados:')
         # ds = dashboard(best, display_format='inline')
 
