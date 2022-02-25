@@ -263,7 +263,8 @@ if uploaded_file is not None:
             # best = compare_models(sort='F1')#,n_select=3)
             # score_grid = pull()
             st.write('### Grilla de búsqueda de modelos:')
-            st.write(grid2.type())
+            st.write(grid1)
+            st.write(grid2)
 
             st.write('### Apilamiento de los mejors 5 modelos con mejor desempeño:')
             st.write('# Los mejores clasificador fueron:')
