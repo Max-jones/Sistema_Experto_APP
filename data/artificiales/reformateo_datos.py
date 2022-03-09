@@ -4,7 +4,7 @@ import pandas as pd
 # raiz_ntbk = 'C:\\Users\\elmha\OneDrive - Universidad de Chile\GitHub\Sistema_Experto_APP\data\\artificiales\'
 raiz = "C:\\Users\\Universidad de Chile\Documents\\GitHub\\Sistema_Experto_APP\\data\\artificiales\\"
 # %%%% 
-%timeit
+# %timeit
 p1 = pd.read_csv(raiz+'Pozo_1_Labeled.csv',sep=';')
 
 p2 = pd.read_csv(raiz+'Pozo_2_Labeled.csv',sep=';')
@@ -28,9 +28,3 @@ for pozo in p:
     pozo.to_csv(name,sep=';')
 
     i+=1
-# %%
-%%timeit
-# pozo
-# %%
-# df
-# %%
