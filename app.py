@@ -280,9 +280,9 @@ if uploaded_file is not None:
         supervised.plot_model(best,plot = 'boundary',display_format='streamlit')
         supervised.plot_model(best,plot = 'calibration',display_format='streamlit')
         # supervised.plot_model(best,plot = 'vc',display_format='streamlit')
-        supervised.plot_model(best,plot = 'feature',display_format='streamlit')
-        supervised.plot_model(best,plot = 'feature_all',display_format='streamlit')
-        supervised.plot_model(best,plot = 'parameter',display_format='streamlit')
+        # supervised.plot_model(best,plot = 'feature',display_format='streamlit')
+        # supervised.plot_model(best,plot = 'feature_all',display_format='streamlit')
+        # supervised.plot_model(best,plot = 'parameter',display_format='streamlit')
         
         
         leaderboard = supervised.get_leaderboard()
