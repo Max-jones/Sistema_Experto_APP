@@ -15,11 +15,6 @@
 
 # %% Imports -> requeriments.txt
 
-# Funcionalidades de la aplicación
-from numpy.lib.function_base import select
-import streamlit as st
-# import pandas_profiling
-from streamlit_pandas_profiling import st_profile_report
 
 
 # import pandas_profiling
@@ -30,8 +25,14 @@ import numpy as np ##
 import altair as alt ##
 import pydeck as pdk ##
 
+# Funcionalidades de la aplicación
+from numpy.lib.function_base import select
+import streamlit as st
+import pandas_profiling
+from streamlit_pandas_profiling import st_profile_report
 
-import seaborn as sns
+
+# import seaborn as sns
 
 # from streamlit.proto.DataFrame_pb2 import DataFrame
 
@@ -149,7 +150,7 @@ def cargar_modelo(df,modelo):
 
     modelo = supervised.load_model('stack inicial')
     
-    return (modelo, grid)
+    return (modelo)
 
 # Creando las secciones de visualización de la aplicación
 
