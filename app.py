@@ -18,7 +18,7 @@
 # Funcionalidades de la aplicación
 from numpy.lib.function_base import select
 import streamlit as st
-import pandas_profiling
+# import pandas_profiling
 from streamlit_pandas_profiling import st_profile_report
 
 
