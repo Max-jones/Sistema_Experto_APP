@@ -87,12 +87,15 @@ try:
 
     @st.cache
     def load_data(path):
-        """
+        '''
         ARGS: path to the local .csv file
         Load data and search for the Date_Time column to index the dataframe by a datetime value.
 
-        """
-        data = pd.read_csv(path,delimiter=";")  # , engine='python')
+        '''
+
+        data = pd.read_csv(path,sep=None, engine='python')
+            
+        # st.write("Se entró en el except")
         data["Date_Time"] = pd.to_datetime(data["Date_Time"])
         data.set_index("Date_Time", inplace=True)
         chile = pytz.timezone("Chile/Continental")
@@ -156,7 +159,7 @@ try:
         return (modelo)
 
     # Creando las secciones de visualización de la aplicación
-
+#%%%
     # Título de la plataforma
     '''
     # Sistema Experto - Plataforma WEB para detección de anomalías
@@ -172,18 +175,35 @@ try:
     # Sección de carga del archivo .csv
 
     # Widget para cargar el archivo
-    uploaded_file = st.sidebar.file_uploader("Selecciona un archivo .csv ")
+    uploaded_file = st.sidebar.file_uploader("Selecciona un archivo .csv ",type='csv')
 
     # La aplicación comienza cuando se carga un archivo.
-
+    # from detect_delimiter import detect
+    # from io import StringIO
+    # import io
     if uploaded_file is not None:
+        
         uploaded_file.seek(0)
+        # # To convert to a string based IO:
+        # stringio = io.StringIO(uploaded_file.getvalue().decode("utf-8"))
+        # st.write(stringio)
 
+        # # To read file as string:
+        # string_data = stringio.read()
+        # st.sidebar.write(type(string_data))
+        # st.write(string_data)
+
+        # # f = io.BytesIO(uploaded_file)
+        
+        # st.sidebar.write(type(uploaded_file))
+        # st.sidebar.write(type(string_data))
+        # st.sidebar.write(type(stringio))
         # Se carga el archivo
         ds = load_data(uploaded_file)
 
         # Confirmación carga archivo
         st.sidebar.write("**Se ha cargado un archivo.**")
+        # st.sidebar.write(detect(uploaded_file))
 
         # Se extraen los nombres de las columnas del dataset cargado.
         columns_names_list = ds.columns.to_list()
@@ -354,7 +374,7 @@ try:
             # sns.barplot(x='Accuracy', y='Classifier', data=log, color="b")
             # st.pyplot(results_fig)
 except KeyError:
-    st.error("Please select a key value from the dropdown to continue.")
+    st.error("Se ha ingresado un archivo sin la sintaxis pedida.")
     
 except ValueError:
     st.error("Oops, something went wrong. Please check previous steps for inconsistent input.")
