@@ -124,12 +124,9 @@ try:
 
     # @st.cache
     def entrenar_modelos(df, etiqueta, metrica, ensamble=True):
-         """
-        ARGS: 
-    
-
-        """       
-
+        '''
+        '''
+        
         # setup
         pycaret_s = supervised.setup(df, target = etiqueta, session_id = 123, silent = True, use_gpu = True, profile = False)     
         # model training and selection
@@ -161,9 +158,9 @@ try:
     # Creando las secciones de visualización de la aplicación
 
     # Título de la plataforma
-    """
+    '''
     # Sistema Experto - Plataforma WEB para detección de anomalías
-    """
+    '''
 
     st.sidebar.write("## Menu de pre-configuración")
     st.sidebar.write(
