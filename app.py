@@ -71,7 +71,7 @@ from pycaret import classification as supervised
 from pycaret import anomaly as unsupervised
 # import pycaret.anomaly as unsupervised
 
-    try:
+try:
     ### Initial Confiugurations
     # SETTING PAGE CONFIG TO WIDE MODE
     st.set_page_config(
@@ -124,7 +124,11 @@ from pycaret import anomaly as unsupervised
 
     # @st.cache
     def entrenar_modelos(df, etiqueta, metrica, ensamble=True):
-        
+         """
+        ARGS: 
+    
+
+        """       
 
         # setup
         pycaret_s = supervised.setup(df, target = etiqueta, session_id = 123, silent = True, use_gpu = True, profile = False)     
