@@ -28,6 +28,7 @@ import numpy as np ##
 import altair as alt ##
 import pydeck as pdk ##
 
+import base64
 # Funcionalidades de la aplicación
 from numpy.lib.function_base import select
 import streamlit as st
@@ -70,6 +71,97 @@ from sklearn.metrics import accuracy_score, log_loss
 from pycaret import classification as supervised
 from pycaret import anomaly as unsupervised
 # import pycaret.anomaly as unsupervised
+def set_bg_hack(main_bg):
+    '''
+    A function to unpack an image from root folder and set as bg.
+    The bg will be static and won't take resolution of device into account.
+    Returns
+    -------
+    The background.
+    '''
+    # set bg name
+    main_bg_ext = "png"
+        
+    st.markdown(
+         f"""
+         <style>
+         .stApp {{
+             background: url(data:image/{main_bg_ext};base64,{base64.b64encode(open(main_bg, "rb").read()).decode()});
+             background-size: cover
+         }}
+         </style>
+         """,
+         unsafe_allow_html=True
+     )
+     
+@st.cache(suppress_st_warning=True) 
+def load_data(path):
+    '''
+    ARGS: path to the local .csv file
+    Load data and search for the Date_Time column to index the dataframe by a datetime value.
+
+    '''
+
+    data = pd.read_csv(path,sep=None, engine='python')
+    try:    
+        # st.write("Se entró en el except")
+        data["Date_Time"] = pd.to_datetime(data["Date_Time"])
+        st.sidebar.write('Se encontró una columa "Date_time"')
+        data.set_index("Date_Time", inplace=True)
+        chile = pytz.timezone("Chile/Continental")
+        data.index = data.index.tz_localize(pytz.utc).tz_convert(chile)
+        return data
+    except:
+        try:   
+            data['Date_Time'] = pd.to_datetime(data["Date_Time"])
+            st.sidebar.write('Se encontró una columa "Date_time"')
+            data.set_index("Date_Time", inplace=True)
+            chile = pytz.timezone("Chile/Continental")
+            data.index = data.index.tz_localize(pytz.utc).tz_convert(chile)
+            return data
+        except:
+            st.sidebar.write("No se encontró columna Date_Time")
+            return data
+
+# @st.cache
+def entrenar_modelos(df, etiqueta, metrica, ensamble=True):
+    '''
+    ARGS: dataframe (pd.DataFrame), 
+    etiqueta con nombre de dataframe.column (str),
+    metrica puede ser ['f1', 'accuracy', 'recall'] (str) y
+    ensamble[default=True, False] (boolean)
+    '''
+
+    # setup
+    pycaret_s = supervised.setup(df, target = etiqueta, session_id = 123, silent = True, use_gpu = True, profile = False, log_experiment = True)     
+    # model training and selection
+    if ensamble:
+        top10 = supervised.compare_models(n_select = 10) 
+        st.write(top10)
+        top5 = top10[0:4]
+        st.write(top5)
+        # tune top 5 base models
+        grid_a= supervised.pull()
+        tuned_top5 = [supervised.tune_model(i,fold = 5, optimize='F1',search_library='scikit-optimize') for i in top5]
+        grid_b=supervised.pull()
+        stacker = supervised.stack_models(estimator_list = top5[1:], meta_model = top5[0])
+
+        # 
+        return (stacker, grid_a, grid_b)
+    else:
+        best = supervised.compare_models(sort= metrica, n_select=3)
+        grid = supervised.pull()
+        return (best, grid, grid)
+    
+def deteccion_no_supervisada(df, metrica, etiqueta=None,  ensamble=True):
+    return ""
+
+def cargar_modelo(df,modelo):
+
+    modelo = supervised.load_model('stack inicial')
+    
+    return (modelo)
+
 
 try:
     ### Initial Confiugurations
@@ -80,83 +172,9 @@ try:
         page_icon="🚀",
         initial_sidebar_state="expanded",
     )
-
+    set_bg_hack('tesis_background.png')
     # LOADING LOCAL DATA IF EXISTS.
-    # local_path = "C:\\Users\elmha\OneDrive - Universidad de Chile\Magíster\Tesis\Sistema-Experto\Data\processed/dataframe.csv"
-
-
-    @st.cache
-    def load_data(path):
-        '''
-        ARGS: path to the local .csv file
-        Load data and search for the Date_Time column to index the dataframe by a datetime value.
-
-        '''
-
-        data = pd.read_csv(path,sep=None, engine='python')
-            
-        # st.write("Se entró en el except")
-        data["Date_Time"] = pd.to_datetime(data["Date_Time"])
-        data.set_index("Date_Time", inplace=True)
-        chile = pytz.timezone("Chile/Continental")
-        data.index = data.index.tz_localize(pytz.utc).tz_convert(chile)
-        return data
-
-    def show_cv_iterations(n_splits, X, y, timeseries=True):
-        # https://medium.com/@soumyachess1496/cross-validation-in-time-series-566ae4981ce4
-        if timeseries:
-            cv = TimeSeriesSplit(n_splits)
-        else:
-            cv = KFold(n_splits)
-        
-        figure, ax = plt.subplots(figsize=(10, 5))
-
-        for ii, (tr, tt) in enumerate(cv.split(X, y)):
-            
-            p1 = ax.scatter(tr, [ii] * len(tr), c='black', marker="_", lw=8)
-            p2 = ax.scatter(tt, [ii] * len(tt), c='red', marker="_", lw=8)
-            ax.set(
-                title="Behavior of TimeseriesSplit",
-                xlabel="Data Index",
-                ylabel="CV Iteration",
-                ylim=[5, -1],
-            )
-            ax.legend([p1, p2], ["Training", "Validation"])
-        st.pyplot(fig=figure)
-        return cv
-
-    # @st.cache
-    def entrenar_modelos(df, etiqueta, metrica, ensamble=True):
-        '''
-        '''
-        
-        # setup
-        pycaret_s = supervised.setup(df, target = etiqueta, session_id = 123, silent = True, use_gpu = True, profile = False)     
-        # model training and selection
-        if ensamble:
-            top5 = supervised.compare_models(n_select = 5) 
-            # tune top 5 base models
-            grid_a= supervised.pull()
-            tuned_top5 = [supervised.tune_model(i,fold = 5, optimize='F1',search_library='scikit-optimize') for i in top5]
-            grid_b=supervised.pull()
-            stacker = supervised.stack_models(estimator_list = top5[1:], meta_model = top5[0])
-
-            # 
-            return (stacker, grid_a, grid_b)
-        else:
-            best = supervised.compare_models(sort= metrica, n_select=3)
-            grid = supervised.pull()
-            return (best, grid, grid)
-        
-    def deteccion_no_supervisada(df, metrica, etiqueta=None,  ensamble=True):
-        return ""
-
-
-    def cargar_modelo(df,modelo):
-
-        modelo = supervised.load_model('stack inicial')
-        
-        return (modelo)
+    # local_path = "C:\\Users\elmha\OneDrive - Universidad de Chile\Magíster\Tesis\Sistema-Experto\Data\processed/dataframe.csv" 
 
     # Creando las secciones de visualización de la aplicación
 #%%%
@@ -178,26 +196,11 @@ try:
     uploaded_file = st.sidebar.file_uploader("Selecciona un archivo .csv ",type='csv')
 
     # La aplicación comienza cuando se carga un archivo.
-    # from detect_delimiter import detect
-    # from io import StringIO
-    # import io
+
     if uploaded_file is not None:
         
         uploaded_file.seek(0)
-        # # To convert to a string based IO:
-        # stringio = io.StringIO(uploaded_file.getvalue().decode("utf-8"))
-        # st.write(stringio)
-
-        # # To read file as string:
-        # string_data = stringio.read()
-        # st.sidebar.write(type(string_data))
-        # st.write(string_data)
-
-        # # f = io.BytesIO(uploaded_file)
-        
-        # st.sidebar.write(type(uploaded_file))
-        # st.sidebar.write(type(string_data))
-        # st.sidebar.write(type(stringio))
+ 
         # Se carga el archivo
         ds = load_data(uploaded_file)
 
@@ -239,11 +242,9 @@ try:
         elif labeled == "Seleccione una opción✅":  
             st.sidebar.write("Las preguntas anteriores son obligatorias.")  
 
-
         ready = st.sidebar.button("Comenzar!")
 
         if ready:
-    
             selected_df = ds[selected_features]
             if labeled == 'Sí':
                 selected_df['target'] = ds[target]
@@ -261,11 +262,11 @@ try:
                 if st.button("Generar un reporte exploratorio inicial 🕵️"):
 
             
-                # st.write(selected_df)  # use_container_width=True)
-                    pr = complete_df.profile_report()
+                    st.write(selected_df)  # use_container_width=True)
+                    # pr = complete_df.profile_report()
                     # profile = ProfileReport(pr, title="Reporte de exploración de datos")
 
-                    st_profile_report(pr)
+                    # st_profile_report(pr)
                 else:
                     st.write('🚧 Por favor seleccione primero las variables a analizar 🚧. ')
             # else:
@@ -377,7 +378,7 @@ except KeyError:
     st.error("Se ha ingresado un archivo sin la sintaxis pedida.")
     
 except ValueError:
-    st.error("Oops, something went wrong. Please check previous steps for inconsistent input.")
+    st.error("Oops, something went wrong. Please check previous steps for inconsistent input (ValueError).")
     
 except TypeError:
-    st.error("Oops, something went wrong. Please check previous steps for inconsistent input.")
+    st.error("Oops, something went wrong. Please check previous steps for inconsistent input (TypeError).")
