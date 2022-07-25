@@ -28,11 +28,11 @@ import numpy as np ##
 import altair as alt ##
 import pydeck as pdk ##
 
-import base64
+
 # Funcionalidades de la aplicación
 from numpy.lib.function_base import select
 import streamlit as st
-
+import base64
 # import pandas_profiling
 # from streamlit_pandas_profiling import st_profile_report
 
@@ -217,7 +217,7 @@ try:
         """
         ### 2️⃣ Seleccione los nombres de las columnas que contienen características
         """)
-        
+        # st.radio("Seleccione las variables",columns_names_list)
 
         selected_features = st.sidebar.multiselect(
             " Seleccione las características",
@@ -277,13 +277,14 @@ try:
             
             st.write('## Detección de anomalías')
             if labeled:
-                antes = time.time()
-                best, grid1, grid2  = entrenar_modelos(complete_df, 'target', 'F1')
-                despues = time.time()
-                delta_t = despues- antes
-                str_t = 'El entrenamiento demoró: '+str(delta_t) + ' segundos.'
-                st.write(str_t)
-                # pycaret_s = setup(complete_df, target = 'target', session_id = 123, silent = True, use_gpu = True, profile = False)     
+                with st.spinner('Entrenando los modelos, esto puede tardar unos minutos...'):
+                    antes = time.time()
+                    best, grid1, grid2  = entrenar_modelos(complete_df, 'target', 'F1')
+                    despues = time.time()
+                    delta_t = despues- antes
+                    str_t = 'El entrenamiento demoró: '+str(delta_t) + ' segundos.'
+                    st.write(str_t)
+                    # pycaret_s = setup(complete_df, target = 'target', session_id = 123, silent = True, use_gpu = True, profile = False)     
                 # model training and selection
                 # best = compare_models(sort='F1')#,n_select=3)
                 # score_grid = pull()
@@ -333,7 +334,7 @@ try:
             #     SVC(probability=True),
             #     DecisionTreeClassifier(),
             #     RandomForestClassifier(),
-            #     AdaBoostClassifier(),
+            #     AdaBoostClassifier(), 
             #     GradientBoostingClassifier(),
             #     GaussianNB(),
             #     LinearDiscriminantAnalysis(),
