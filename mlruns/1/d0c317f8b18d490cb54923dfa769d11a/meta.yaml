@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/elmha/OneDrive%20-%20Universidad%20de%20Chile/GitHub/Sistema_Experto_APP/mlruns/1/d0c317f8b18d490cb54923dfa769d11a/artifacts
+end_time: 1653786616020
+entry_point_name: ''
+experiment_id: '1'
+lifecycle_stage: active
+name: ''
+run_id: d0c317f8b18d490cb54923dfa769d11a
+run_uuid: d0c317f8b18d490cb54923dfa769d11a
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1653786615713
+status: 3
+tags: []
+user_id: elmha
