@@ -139,7 +139,4 @@ images/plataforma2.gif
 .vscode/settings.json
 
 catboost_info/
-/mlruns
-
-
-catboost_info/catboost_training.json
+mlruns/
