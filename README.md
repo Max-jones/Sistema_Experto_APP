@@ -44,6 +44,8 @@ Abriendo un terminal con el virtualenv o si se realizó la instalación de la se
 Para poder probar la app es necesario abrir un terminal en la carpeta del proyecto y correr
 
 ```console
+conda activate <venv_name>
+
 streamlit run streamlit_app.py
 ```
 
