@@ -14,9 +14,9 @@
 # limitations under the License.
 
 # %% Imports -> requeriments.txt
-'''
-Creada por Maximiliano Jones
-'''
+
+# Creada por Maximiliano Jones
+
 
 # import pandas_profiling
 
@@ -40,11 +40,11 @@ import base64
 import pytz
 
 # Visualización
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 # import plotly.graph_objects as go
 # import plotly.figure_factory as ff
 # import plotly.express as px
-from bokeh.plotting import figure
+# from bokeh.plotting import figure
 
 # # Clasificadores
 # from sklearn.neighbors import KNeighborsClassifier
