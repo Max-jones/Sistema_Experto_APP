@@ -1,8 +1,0 @@
-{
-    "python.pythonPath": "C:\\Users\\elmha\\anaconda3\\envs\\Sistema-Experto\\python.exe",
-    "jupyter.jupyterServerType": "local",
-    "python.analysis.extraPaths": [
-        "./src",
-        "./src"
-    ]
-}

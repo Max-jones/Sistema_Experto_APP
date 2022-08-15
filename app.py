@@ -172,7 +172,7 @@ try:
         page_icon="🚀",
         initial_sidebar_state="expanded",
     )
-    set_bg_hack('tesis_background.png')
+    set_bg_hack('images/tesis_background.png')
     # LOADING LOCAL DATA IF EXISTS.
     # local_path = "C:\\Users\elmha\OneDrive - Universidad de Chile\Magíster\Tesis\Sistema-Experto\Data\processed/dataframe.csv" 
 
