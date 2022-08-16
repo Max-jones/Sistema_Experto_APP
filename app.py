@@ -1,75 +1,29 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018-2019 Streamlit Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-# %% Imports -> requeriments.txt
 
 # Creada por Maximiliano Jones
 
 
-# import pandas_profiling
-
 # Manejo de datos
 import pandas as pd
-import numpy as np  ##
-import altair as alt  ##
-import pydeck as pdk  ##
 
 # Funcionalidades de la aplicación
-from numpy.lib.function_base import select
 import streamlit as st
 import base64
 # import pandas_profiling
 # from streamlit_pandas_profiling import st_profile_report
 
-
-# import seaborn as sns
-
-
+# Manejod del tiempo/fechas
 import pytz
-
-# Visualización
-# import matplotlib.pyplot as plt
-# import plotly.graph_objects as go
-# import plotly.figure_factory as ff
-# import plotly.express as px
-# from bokeh.plotting import figure
-
-# # Clasificadores
-# from sklearn.neighbors import KNeighborsClassifier
-# from sklearn.svm import SVC
-# from sklearn.tree import DecisionTreeClassifier
-# from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier
-# from sklearn.naive_bayes import GaussianNB
-# from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
-# from sklearn.linear_model import LogisticRegression
-
-# import lightgbm as lgbm
-# import xgboost as xgb
-
 import time
 
-# Model Selection
-from sklearn.model_selection import TimeSeriesSplit, KFold
-from sklearn.metrics import accuracy_score, log_loss
 
 # Automated Classification
 from pycaret import classification as supervised
-from pycaret import anomaly as unsupervised
-
-
 # import pycaret.anomaly as unsupervised
+
+
+# Funciones auxiliares
+
 def set_bg_hack(main_bg):
     '''
     A function to unpack an image from root folder and set as bg.
@@ -113,7 +67,7 @@ def load_data(path):
         return data
     except:
         try:
-            data['Date_Time'] = pd.to_datetime(data["Date_Time"])
+            data['Date_time'] = pd.to_datetime(data["Date_Time"])
             st.sidebar.write('Se encontró una columa "Date_time"')
             data.set_index("Date_Time", inplace=True)
             chile = pytz.timezone("Chile/Continental")
@@ -123,8 +77,7 @@ def load_data(path):
             st.sidebar.write("No se encontró columna Date_Time")
             return data
 
-
-# @st.cache
+@st.cache
 def entrenar_modelos(df, etiqueta, metrica, ensamble=True):
     '''
     ARGS: dataframe (pd.DataFrame),
@@ -155,10 +108,8 @@ def entrenar_modelos(df, etiqueta, metrica, ensamble=True):
         grid = supervised.pull()
         return (best, grid, grid)
 
-
 def deteccion_no_supervisada(df, metrica, etiqueta=None, ensamble=True):
     return ""
-
 
 def cargar_modelo(df, modelo):
     modelo = supervised.load_model('stack inicial')
