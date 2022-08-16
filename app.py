@@ -229,6 +229,10 @@ try:
                     
                     st.dataframe(selected_df)  # use_container_width=True)
                     st.write('🚧 Por favor seleccione primero las variables a analizar 🚧. ')
+                    describe=selected_df.describe().T.style.bar(subset=['mean'], color='#E68193')\
+                            .background_gradient(subset=['std'], cmap='mako_r')\
+                             .background_gradient(subset=['50%'], cmap='mako')
+                    st.dataframe(describe)
             # %% 
 
             st.write('## Detección de anomalías')
