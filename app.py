@@ -4,6 +4,7 @@
 
 
 # Manejo de datos
+from ast import parse
 import pandas as pd
 
 # Funcionalidades de la aplicación
@@ -48,7 +49,7 @@ def set_bg_hack(main_bg):
     )
 
 
-@st.cache(suppress_st_warning=True)
+# @st.cache(suppress_st_warning=True)
 def load_data(path):
     '''
     ARGS: path to the local .csv file
@@ -56,28 +57,33 @@ def load_data(path):
 
     '''
 
-    data = pd.read_csv(path, sep=None, engine='python')
+    data = pd.read_csv(path, sep=None, engine='python',encoding = 'utf-8-sig',parse_dates= True)
+
     try:
-        # st.write("Se entró en el except")
-        data["Date_Time"] = pd.to_datetime(data["Date_Time"])
+        # st.write(data[data.columns[0]].describe())
+        # st.dataframe(data[data.columns[0]])
+        data['Date_Time'] = pd.to_datetime(data['Date_Time'])
         st.sidebar.write('Se encontró una columa "Date_time"')
         data.set_index("Date_Time", inplace=True)
         chile = pytz.timezone("Chile/Continental")
         data.index = data.index.tz_localize(pytz.utc).tz_convert(chile)
+        st.dataframe(data)
         return data
     except:
         try:
-            data['Date_time'] = pd.to_datetime(data["Date_Time"])
-            st.sidebar.write('Se encontró una columa "Date_time"')
+            st.write("Se entró en el segundo except")
+            data['Datetime'] = pd.to_datetime(data["Date_Time"])
+            # st.sidebar.write('Se encontró una columa "Date_time"')
             data.set_index("Date_Time", inplace=True)
-            chile = pytz.timezone("Chile/Continental")
-            data.index = data.index.tz_localize(pytz.utc).tz_convert(chile)
+            # chile = pytz.timezone("Chile/Continental")
+            # data.index = data.index.tz_localize(pytz.utc).tz_convert(chile)
             return data
         except:
+            st.write("Se entró en el tercer except")
             st.sidebar.write("No se encontró columna Date_Time")
             return data
 
-@st.cache
+# @st.cache
 def entrenar_modelos(df, etiqueta, metrica, ensamble=True):
     '''
     ARGS: dataframe (pd.DataFrame),
