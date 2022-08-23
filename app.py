@@ -23,6 +23,8 @@ from pycaret import classification as supervised
 # import pycaret.anomaly as unsupervised
 
 
+import plotly.express as px
+
 # Funciones auxiliares
 
 def set_bg_hack(main_bg):
@@ -81,8 +83,9 @@ def load_data(path):
             st.sidebar.write("No se encontró columna Date_Time")
             return data
 
-@st.cache(allow_output_mutation=True)
+@st.cache(allow_output_mutation=True,suppress_st_warning=True)
 def entrenar_modelos(df, etiqueta, metrica, ensamble=True, debug=True):
+
     '''
     ARGS: dataframe (pd.DataFrame),
     etiqueta con nombre de dataframe.column (str),
@@ -124,6 +127,26 @@ def entrenar_modelos(df, etiqueta, metrica, ensamble=True, debug=True):
     return (modelo)
 
 
+colors_blue = ["#132C33", "#264D58", '#17869E', '#51C4D3', '#B4DBE9']
+colors_dark = ["#1F1F1F", "#313131", '#636363', '#AEAEAE', '#DADADA']
+colors_green = ['#01411C','#4B6F44','#4F7942','#74C365','#D0F0C0']
+
+def generar_distrib(df, etiqueta):
+    figura = px.histogram(df,x=etiqueta,y=df[etiqueta],color='target',template='plotly_white',
+                    marginal='box',opacity=0.7,nbins=100,color_discrete_sequence=[colors_green[3],colors_blue[3]],
+                    barmode='group',histfunc='count')
+                    
+    figura.update_layout(
+        font_family='monospace',
+        title=dict(text=etiqueta,x=0.53,y=0.95,
+                font=dict(color=colors_dark[2],size=20)),
+        xaxis_title_text=etiqueta,
+        yaxis_title_text='Count',
+        legend=dict(x=1,y=0.96,bordercolor=colors_dark[4],borderwidth=0,tracegroupgap=5),
+        bargap=0.3,
+    )
+    return figura
+
 try:
     ### Initial Confiugurations
     # SETTING PAGE CONFIG TO WIDE MODE
@@ -133,7 +156,7 @@ try:
         page_icon="🚀",
         initial_sidebar_state="expanded",
     )
-    set_bg_hack('images/tesis_background.png')
+    set_bg_hack('images/app_background.png')
     # LOADING LOCAL DATA IF EXISTS.
     # local_path = "C:\\Users\elmha\OneDrive - Universidad de Chile\Magíster\Tesis\Sistema-Experto\Data\processed/dataframe.csv"
 
@@ -143,6 +166,15 @@ try:
     '''
     # Sistema Experto - Plataforma WEB para detección de anomalías
     '''
+
+
+    st.image('images/metodologia3.png')
+    info = st.info("""Instrucciones:
+          
+          1. El primer paso es cargar el set de datos a procesar en el apartado 1️⃣ del panel lateral. 
+          NOTA: El archivo debe estar en formato .csv y no debe ter filas vacías antes de las columnas de cabecera de los datos.
+    2. Ahora se deben seleccionar los nombres de las columnas o atributos con información relevante para la detección de anomalías en el aparato 2️⃣.
+    3. Finalmente se debe seleccionar la etiqueta o el target de las anomalías etiquetadas y hacer click en "Comenzar". """)
 
     st.sidebar.write("## Configuración inicial")
     st.sidebar.write(
@@ -203,13 +235,71 @@ try:
             elif labeled == "Seleccione una opción✅":
                 st.write("Las preguntas anteriores son obligatorias.")
 
-            ready = st.button("Comenzar!")
+            #Etiqueta para comenzar
+            ready = False
+            if labeled != "Seleccione una opción ✔️":
+                if labeled == 'Sí':
+                    selected_df = ds[selected_features]
+                    selected_df['target'] = ds[target]
+
+                
+                ready = st.button("Comenzar!")
+        st.write('## Análisis exploratorio estadístico y visual de los datos cargados: ')
+        with st.expander("🕵️ Reporte exploratorio preliminar 📃", expanded=True):
+            
+        
+            a1, a2 = st.columns([2,3])
+            a1.subheader('Set de datos original:')
+            a1.dataframe(selected_df)  # use_container_width=True)
+            
+            describe=selected_df.describe().T.style.bar(subset=['mean'], color='#E68193')\
+                    .background_gradient(subset=['std'], cmap='mako_r')\
+                        .background_gradient(subset=['50%'], cmap='mako')
+            a2.subheader("Descripción estadística de los datos cargados")
+            a2.dataframe(describe)
+            df=pd.DataFrame()
+            df['etiqueta conjunta'] = selected_df['target'].replace([0,1],['normal','anomalía'])
+            d= pd.DataFrame(df['etiqueta conjunta'].value_counts())
+
+            fig = px.pie(d,values='etiqueta conjunta',names=['normal','anomalía'],hole=0.4,opacity=0.6,
+                        color_discrete_sequence=[colors_green[3],colors_blue[3]],
+                        labels={'label':'etiqueta conjunta','etiqueta conjunta':'No. Of Samples'})
+
+            fig.add_annotation(text='Los resultados sugieren un set de datos desbalanceados',
+                            x=1.2,y=0.9,showarrow=False,font_size=12,opacity=0.7,font_family='monospace')
+            fig.add_annotation(text='etiquetado experto',
+                            x=0.5,y=0.5,showarrow=False,font_size=14,opacity=0.7,font_family='monospace')
+
+            fig.update_layout(
+                font_family='monospace',
+                title=dict(text='. Cuántos datos corresponden a datos normales?',x=0.47,y=0.98,
+                        font=dict(color=colors_dark[2],size=20)),
+                legend=dict(x=0.37,y=-0.05,orientation='h',traceorder='reversed'),
+                hoverlabel=dict(bgcolor='white'))
+
+            fig.update_traces(textposition='outside', textinfo='percent+label')
+            st.subheader('Composición de etiquetas:')
+            st.plotly_chart(fig, use_container_width=True)
+
+            st.subheader('Distribuciones de las características:')
+            for label in selected_features:
+                f = generar_distrib(selected_df,label)
+
+                st.plotly_chart(f, use_container_width=True)
+            
+            pr_button=False
+            if st.button("Generar un reporte exploratorio más detallado 🕵️"):
+
+                pr = selected_df.profile_report()
+                # profile = ProfileReport(pr, title="Reporte de exploración de datos")
+                pr_button=True
+           
+            if pr_button==True:
+                st_profile_report(pr)
 
         if ready:
-            selected_df = ds[selected_features]
-            if labeled == 'Sí':
-                selected_df['target'] = ds[target]
-
+            
+            
 
 
             # if st.button("Generar un reporte exploratorio inicial 🕵️"):
@@ -217,22 +307,8 @@ try:
             # if st.button('Generar reporte'):
             #     
             #         time.sleep(3)
-            st.write('## Análisis exploratorio estadístico y visual de los datos cargados: ')
-            with st.expander("🕵️ Reporte exploratorio preliminar 📃", expanded=False):
-                if st.button("Generar un reporte exploratorio inicial 🕵️"):
-
-                    pr = selected_df.profile_report()
-                    # profile = ProfileReport(pr, title="Reporte de exploración de datos")
-
-                    st_profile_report(pr)
-                else:
                     
-                    st.dataframe(selected_df)  # use_container_width=True)
-                    st.write('🚧 Por favor seleccione primero las variables a analizar 🚧. ')
-                    describe=selected_df.describe().T.style.bar(subset=['mean'], color='#E68193')\
-                            .background_gradient(subset=['std'], cmap='mako_r')\
-                             .background_gradient(subset=['50%'], cmap='mako')
-                    st.dataframe(describe)
+
             # %% 
 
             st.write('## Detección de anomalías')
@@ -255,8 +331,8 @@ try:
                 # best = compare_models(sort='F1')#,n_select=3)
                 # score_grid = pull()
                 st.write('### Grilla de búsqueda de modelos:')
-                st.write(grid1)
-                st.write(grid2)
+                st.write(grid1.sort_values('F1',ascending=False).style.background_gradient(axis=0,cmap='mako'))
+                # st.write(grid2)
 
                 st.write('### Apilamiento de los mejors 5 modelos con mejor desempeño:')
                 st.write('# Los mejores clasificador fueron:')
