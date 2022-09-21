@@ -2,7 +2,6 @@
 
 # Creada por Maximiliano Jones
 
-
 # Manejo de datos
 from ast import parse
 import pandas as pd
@@ -94,7 +93,7 @@ def entrenar_modelos(df, etiqueta, metrica, ensamble=True, debug=True):
     '''
 
     # setup
-    pycaret_s = supervised.setup(df, target=etiqueta, session_id=123, silent=True, use_gpu=False, profile=False, log_experiment=False)
+    pycaret_s = supervised.setup(df, target=etiqueta, session_id=123, silent=True, use_gpu=False, profile=False, log_experiment=False, fix_imbalance=True)
     # model training and selection
     if ensamble:
         # with st.snow():
@@ -118,6 +117,7 @@ def entrenar_modelos(df, etiqueta, metrica, ensamble=True, debug=True):
         grid = supervised.pull()
         return (best, grid, grid)
 
+
 # def deteccion_no_supervisada(df, metrica, etiqueta=None, ensamble=True):
 #     return ""
 
@@ -132,7 +132,7 @@ colors_dark = ["#1F1F1F", "#313131", '#636363', '#AEAEAE', '#DADADA']
 colors_green = ['#01411C','#4B6F44','#4F7942','#74C365','#D0F0C0']
 
 def generar_distrib(df, etiqueta):
-    figura = px.histogram(df,x=etiqueta,y=df[etiqueta],color='target',template='plotly_white',
+    figura = px.histogram(df,x=etiqueta,y=df[etiqueta],color='Etiqueta',template='plotly_white',
                     marginal='box',opacity=0.7,nbins=100,color_discrete_sequence=[colors_green[3],colors_blue[3]],
                     barmode='group',histfunc='count')
                     
@@ -166,7 +166,6 @@ try:
     '''
     # Sistema Experto - Plataforma WEB para detección de anomalías
     '''
-
 
     st.image('images/metodologia3.png')
     info = st.info("""Instrucciones:
@@ -240,53 +239,54 @@ try:
             if labeled != "Seleccione una opción ✔️":
                 if labeled == 'Sí':
                     selected_df = ds[selected_features]
-                    selected_df['target'] = ds[target]
-
-                
+                    selected_df['Etiqueta'] = ds[target]
+              
                 ready = st.button("Comenzar!")
         st.write('## Análisis exploratorio estadístico y visual de los datos cargados: ')
         with st.expander("🕵️ Reporte exploratorio preliminar 📃", expanded=True):
-            
-        
+                
             a1, a2 = st.columns([2,3])
-            a1.subheader('Set de datos original:')
-            a1.dataframe(selected_df)  # use_container_width=True)
-            
-            describe=selected_df.describe().T.style.bar(subset=['mean'], color='#E68193')\
-                    .background_gradient(subset=['std'], cmap='mako_r')\
-                        .background_gradient(subset=['50%'], cmap='mako')
-            a2.subheader("Descripción estadística de los datos cargados")
-            a2.dataframe(describe)
-            df=pd.DataFrame()
-            df['etiqueta conjunta'] = selected_df['target'].replace([0,1],['normal','anomalía'])
-            d= pd.DataFrame(df['etiqueta conjunta'].value_counts())
+            if labeled == 'Sí':
 
-            fig = px.pie(d,values='etiqueta conjunta',names=['normal','anomalía'],hole=0.4,opacity=0.6,
-                        color_discrete_sequence=[colors_green[3],colors_blue[3]],
-                        labels={'label':'etiqueta conjunta','etiqueta conjunta':'No. Of Samples'})
+                a1.subheader('Set de datos original:')
+                a1.dataframe(selected_df)  # use_container_width=True)
+                
+                describe=selected_df.describe().T.style.bar(subset=['mean'], color='#E68193')\
+                        .background_gradient(subset=['std'], cmap='mako_r')\
+                            .background_gradient(subset=['50%'], cmap='mako')
+                a2.subheader("Descripción estadística de los datos cargados")
+                a2.dataframe(describe)
+                df=pd.DataFrame()
+                df['etiqueta conjunta'] = selected_df['Etiqueta'].replace([0,1],['normal','anomalía'])
+                d = pd.DataFrame(df['etiqueta conjunta'].value_counts())
 
-            fig.add_annotation(text='Los resultados sugieren un set de datos desbalanceados',
-                            x=1.2,y=0.9,showarrow=False,font_size=12,opacity=0.7,font_family='monospace')
-            fig.add_annotation(text='etiquetado experto',
-                            x=0.5,y=0.5,showarrow=False,font_size=14,opacity=0.7,font_family='monospace')
+                fig = px.pie(d,values='etiqueta conjunta',names=['normal','anomalía'],hole=0.4,opacity=0.6,
+                            color_discrete_sequence=[colors_blue[3],colors_green[3]],
+                            labels={'label':'etiqueta conjunta','etiqueta conjunta':'No. Of Samples'})
 
-            fig.update_layout(
-                font_family='monospace',
-                title=dict(text='. Cuántos datos corresponden a datos normales?',x=0.47,y=0.98,
-                        font=dict(color=colors_dark[2],size=20)),
-                legend=dict(x=0.37,y=-0.05,orientation='h',traceorder='reversed'),
-                hoverlabel=dict(bgcolor='white'))
+                fig.add_annotation(text='Los resultados sugieren un set de datos desbalanceados',
+                                x=1.3,y=0.9,showarrow=False,font_size=18,opacity=0.7,font_family='monospace')
+                fig.add_annotation(text='Etiquetado <br> Experto',
+                                x=0.5,y=0.5,showarrow=False,font_size=14,opacity=0.7,font_family='monospace')
 
-            fig.update_traces(textposition='outside', textinfo='percent+label')
-            st.subheader('Composición de etiquetas:')
-            st.plotly_chart(fig, use_container_width=True)
+                fig.update_layout(
+                    font_family='monospace',
+                    title=dict(text='. Cuántos datos corresponden a datos normales?',x=0.47,y=0.98,
+                            font=dict(color=colors_dark[2],size=28)),
+                    legend=dict(x=0.37,y=-0.05,orientation='h',traceorder='reversed'),
+                    hoverlabel=dict(bgcolor='white'))
 
-            st.subheader('Distribuciones de las características:')
-            for label in selected_features:
-                f = generar_distrib(selected_df,label)
+                fig.update_traces(textposition='outside', textinfo='percent+label')
+                st.subheader('Composición de etiquetas:')
+                st.plotly_chart(fig, use_container_width=True)
 
-                st.plotly_chart(f, use_container_width=True)
-            
+                st.subheader('Distribuciones de las características:')
+                selected_df['Etiqueta'].replace([0,1],['normal','anomalía'],inplace=True)
+                for label in selected_features:
+                    f = generar_distrib(selected_df,label)
+
+                    st.plotly_chart(f, use_container_width=True)
+                
             pr_button=False
             if st.button("Generar un reporte exploratorio más detallado 🕵️"):
 
@@ -298,17 +298,13 @@ try:
                 st_profile_report(pr)
 
         if ready:
-            
-            
-
-
+                      
             # if st.button("Generar un reporte exploratorio inicial 🕵️"):
 
             # if st.button('Generar reporte'):
             #     
             #         time.sleep(3)
                     
-
             # %% 
 
             st.write('## Detección de anomalías')
@@ -317,14 +313,11 @@ try:
             with st.spinner('Entrenando los modelos, esto puede tardar unos minutos...'):
                 antes = time.time()
 
-                best, grid1, grid2 = entrenar_modelos(selected_df, 'target', 'F1')
+                best, grid1, grid2 = entrenar_modelos(selected_df, 'Etiqueta', 'F1')
 
                 despues = time.time()
                 delta_t = despues - antes
                 str_t = 'El entrenamiento demoró: ' + str(delta_t) + ' segundos.'
-
-            
-
                 st.write(str_t)
                     # pycaret_s = setup(complete_df, target = 'target', session_id = 123, silent = True, use_gpu = True, profile = False)
                 # model training and selection
@@ -338,27 +331,32 @@ try:
                 st.write('# Los mejores clasificador fueron:')
                 # st.write(supervised.pull())
 
+                metrics = supervised.get_metrics()
+                st.write(type(metrics))
+
                 supervised.plot_model(best, plot='class_report', display_format='streamlit')
+                # supervised.evaluate_model(best)
+                
                 supervised.plot_model(best, plot='confusion_matrix', display_format='streamlit',
                                     plot_kwargs={'percent': True})
                 supervised.plot_model(best, plot='error', display_format='streamlit')
                 supervised.plot_model(best, plot='pr', display_format='streamlit')
                 supervised.plot_model(best, plot='boundary', display_format='streamlit')
-                supervised.plot_model(best, plot='calibration', display_format='streamlit')
-                supervised.plot_model(best,plot = 'vc',display_format='streamlit')
+                leaderboard = supervised.get_leaderboard()
+                st.dataframe(leaderboard)
+                
                 supervised.plot_model(best,plot = 'feature',display_format='streamlit')
                 supervised.plot_model(best,plot = 'feature_all',display_format='streamlit')
                 supervised.plot_model(best,plot = 'parameter',display_format='streamlit')
-
-                leaderboard = supervised.get_leaderboard()
-
-
+                supervised.plot_model(best, plot='pipeline', display_format='streamlit')
+                supervised.plot_model(best, plot='calibration', display_format='streamlit')   
+                supervised.plot_model(best,plot = 'vc',display_format='streamlit')                             
 
 except KeyError:
-    st.error("Se ha ingresado un archivo sin la sintaxis pedida.")
+    st.error("Se ha ingresado un archivo sin la sintaxis pedida.", icon = "📄")
 
 except ValueError:
-    st.error("Oops, something went wrong. Please check previous steps for inconsistent input (ValueError).")
+    st.error("Oops, algo salió mal. Por favor comprueba que los valores ingresados seas consistentes. (ValueError).", icon = "🚨")
 
 except TypeError:
-    st.error("Oops, something went wrong. Please check previous steps for inconsistent input (TypeError).")
+    st.error("Oops, algo salió mal. Por favor comprueba que no las opciones ingresadas por incosistencias (TypeError).", icon = "⚠️")
