@@ -329,28 +329,33 @@ try:
 
                 st.write('### Apilamiento de los mejors 5 modelos con mejor desempeño:')
                 st.write('# Los mejores clasificador fueron:')
+                st.write(grid1.sort_values('F1',ascending=False).head(5).style.background_gradient(axis=0,cmap='mako'))
                 # st.write(supervised.pull())
 
                 metrics = supervised.get_metrics()
-                st.write(type(metrics))
+                print(metrics)
+                # st.write(type(metrics))
 
-                supervised.plot_model(best, plot='class_report', display_format='streamlit')
+                
                 # supervised.evaluate_model(best)
                 
                 supervised.plot_model(best, plot='confusion_matrix', display_format='streamlit',
                                     plot_kwargs={'percent': True})
+                supervised.plot_model(best, plot='class_report', display_format='streamlit')
                 supervised.plot_model(best, plot='error', display_format='streamlit')
                 supervised.plot_model(best, plot='pr', display_format='streamlit')
-                supervised.plot_model(best, plot='boundary', display_format='streamlit')
-                leaderboard = supervised.get_leaderboard()
-                st.dataframe(leaderboard)
+                # supervised.plot_model(best, plot='boundary', display_format='streamlit')
+                # supervised.plot_model(best,plot = 'feature',display_format='streamlit')
+                # leaderboard = supervised.get_leaderboard()
+                # st.experimental_show(leaderboard)
                 
-                supervised.plot_model(best,plot = 'feature',display_format='streamlit')
-                supervised.plot_model(best,plot = 'feature_all',display_format='streamlit')
-                supervised.plot_model(best,plot = 'parameter',display_format='streamlit')
-                supervised.plot_model(best, plot='pipeline', display_format='streamlit')
-                supervised.plot_model(best, plot='calibration', display_format='streamlit')   
-                supervised.plot_model(best,plot = 'vc',display_format='streamlit')                             
+                supervised.interpret_model(best)
+            
+                # supervised.plot_model(best,plot = 'parameter',display_format='streamlit')
+                # supervised.plot_model(best, plot='pipeline', display_format='streamlit')
+
+                # supervised.plot_model(best, plot='calibration', display_format='streamlit')   
+                # supervised.plot_model(best,plot = 'vc',display_format='streamlit')                             
 
 except KeyError:
     st.error("Se ha ingresado un archivo sin la sintaxis pedida.", icon = "📄")
@@ -360,3 +365,5 @@ except ValueError:
 
 except TypeError:
     st.error("Oops, algo salió mal. Por favor comprueba que no las opciones ingresadas por incosistencias (TypeError).", icon = "⚠️")
+
+# %%
