@@ -249,17 +249,19 @@ try:
             if labeled == 'Sí':
 
                 a1.subheader('Set de datos original:')
-                a1.dataframe(selected_df)  # use_container_width=True)
+                a1.dataframe(selected_df)  # visualización del dataset original (completo)
                 
                 describe=selected_df.describe().T.style.bar(subset=['mean'], color='#E68193')\
                         .background_gradient(subset=['std'], cmap='mako_r')\
                             .background_gradient(subset=['50%'], cmap='mako')
                 a2.subheader("Descripción estadística de los datos cargados")
-                a2.dataframe(describe)
+                a2.dataframe(describe) #descripción estadística columna 2
+
+                #creación nuevo dataframe para el cambio de etiquetas (manual)
                 df=pd.DataFrame()
                 df['etiqueta conjunta'] = selected_df['Etiqueta'].replace([0,1],['normal','anomalía'])
                 d = pd.DataFrame(df['etiqueta conjunta'].value_counts())
-
+                #Gráfico torta composición etiquetas
                 fig = px.pie(d,values='etiqueta conjunta',names=['normal','anomalía'],hole=0.4,opacity=0.6,
                             color_discrete_sequence=[colors_blue[3],colors_green[3]],
                             labels={'label':'etiqueta conjunta','etiqueta conjunta':'No. Of Samples'})
@@ -271,7 +273,7 @@ try:
 
                 fig.update_layout(
                     font_family='monospace',
-                    title=dict(text='. Cuántos datos corresponden a datos normales?',x=0.47,y=0.98,
+                    title=dict(text='¿Cuántos datos corresponden a datos normales?',x=0.47,y=0.98,
                             font=dict(color=colors_dark[2],size=28)),
                     legend=dict(x=0.37,y=-0.05,orientation='h',traceorder='reversed'),
                     hoverlabel=dict(bgcolor='white'))
@@ -279,7 +281,7 @@ try:
                 fig.update_traces(textposition='outside', textinfo='percent+label')
                 st.subheader('Composición de etiquetas:')
                 st.plotly_chart(fig, use_container_width=True)
-
+        
                 st.subheader('Distribuciones de las características:')
                 selected_df['Etiqueta'].replace([0,1],['normal','anomalía'],inplace=True)
                 for label in selected_features:
