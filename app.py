@@ -61,7 +61,7 @@ def load_data(path):
     data = pd.read_csv(path, sep=None, engine='python',encoding = 'utf-8-sig',parse_dates= True)
 
     try:
-        data['Date_Time'] = pd.to_datetime(data['Date_Time'])
+        data['Date_Time'] = pd.to_datetime(data['Date_Time'],dayfirst=True)
         st.sidebar.write('Se encontró una columa "Date_time"')
         data.set_index("Date_Time", inplace=True)
         chile = pytz.timezone("Chile/Continental")
@@ -70,7 +70,7 @@ def load_data(path):
         return data
     except:
         try:
-            data['Datetime'] = pd.to_datetime(data["Date_Time"])
+            data['Datetime'] = pd.to_datetime(data["Date_Time"],)
             st.sidebar.write('Se encontró una columa "Datetime"')
             data.set_index("Datetime", inplace=True)
             chile = pytz.timezone("Chile/Continental")
