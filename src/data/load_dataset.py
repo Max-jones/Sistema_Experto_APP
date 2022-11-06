@@ -11,14 +11,14 @@ def load_data(path):
     data = pd.read_csv(path, sep=None, engine='python')
     try:
 
-        data["Date_Time"] = pd.to_datetime(data["Date_Time"])
+        data["Date_Time"] = pd.to_datetime(data["Date_Time"],format='%d%m%Y', errors='ignore',infer_datetime_format=True,dayfirst=True)
         data.set_index("Date_Time", inplace=True)
         chile = pytz.timezone("Chile/Continental")
         data.index = data.index.tz_localize(pytz.utc).tz_convert(chile)
         return data
     except:
         try:
-            data['Date_Time'] = pd.to_datetime(data["Date_Time"])
+            data['Date_Time'] = pd.to_datetime(data["Date_Time"],format='%d%m%Y', errors='ignore',infer_datetime_format=True,dayfirst=True)
             data.set_index("Date_Time", inplace=True)
             chile = pytz.timezone("Chile/Continental")
             data.index = data.index.tz_localize(pytz.utc).tz_convert(chile)
