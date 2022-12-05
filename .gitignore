@@ -140,3 +140,8 @@ images/plataforma2.gif
 
 catboost_info
 mlruns
+
+data
+
+.data
+/data
