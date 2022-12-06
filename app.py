@@ -344,6 +344,10 @@ try:
                 supervised.plot_model(best, plot='confusion_matrix', display_format='streamlit',
                                     plot_kwargs={'percent': True})
                 supervised.plot_model(best, plot='class_report', display_format='streamlit')
+
+                pred_holdout = supervised.predict_model(best)
+                st.write('La salida de los modelos fue:')
+                st.dataframe(pred_holdout)
                 supervised.plot_model(best, plot='error', display_format='streamlit')
                 supervised.plot_model(best, plot='pr', display_format='streamlit')
                 # supervised.plot_model(best, plot='boundary', display_format='streamlit')
@@ -367,5 +371,4 @@ except ValueError:
 
 except TypeError:
     st.error("Oops, algo salió mal. Por favor comprueba que no las opciones ingresadas por incosistencias (TypeError).", icon = "⚠️")
-
-# %%
+   
